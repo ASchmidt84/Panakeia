@@ -74,7 +74,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
     profileRepository.findUUIDByLogin(username).flatMap{
       case None => throw NotFound(s"The user with $username was not found! Access denied!")
       case Some(id) =>
-        profileEntity(id).ask(reply => ValidatePassword(password,reply)).map{
+        profileEntity(id).ask[ProfileConfirmation](reply => ValidatePassword(password,reply)).map{
           case ProfileCmdAccepted(profile) => generateJwt(profile,id)
           case _ => throw BadRequest("Access denied!")
         }
@@ -90,7 +90,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
     profileRepository.findUUIDByLogin(username).flatMap{
       case Some(id) =>
         profileEntity(id)
-          .ask(reply => Profile.Get(reply))
+          .ask[ProfileConfirmation](reply => Profile.Get(reply))
           .map{
             case ProfileCmdAccepted(pr) => generateJwt(pr,id)
             case _ => throw BadRequest("Profile was not found!")
@@ -113,7 +113,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
     profileRepository.findUUIDByLogin(username).flatMap{
       case Some(id) =>
         profileEntity(id)
-          .ask(reply => AddRole(DefaultRoles.withName(data),reply) )
+          .ask[ProfileConfirmation](reply => AddRole(DefaultRoles.withName(data),reply) )
           .map{
             case ProfileCmdAccepted(_) => NotUsed
             case _ => throw BadRequest("Your privileges are not enough to execute this command")
@@ -136,7 +136,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
     profileRepository.findUUIDByLogin(username).flatMap{
       case Some(id) =>
         profileEntity(id)
-            .ask(reply => RemoveRole(DefaultRoles.withName(data),reply))
+            .ask[ProfileConfirmation](reply => RemoveRole(DefaultRoles.withName(data),reply))
             .map{
               case ProfileCmdAccepted(_) => NotUsed
               case _ => throw BadRequest("Your privileges are not high enough to execute this command")
@@ -158,7 +158,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
       case None =>
         val uuid = UUID.randomUUID()
         profileEntity(uuid)
-          .ask(reply => CreateProfile(data.userName,data.password,Some(data.email), data.roles.toSet, data.personalData, reply ) ).map{
+          .ask[ProfileConfirmation](reply => CreateProfile(data.userName,data.password,Some(data.email), data.roles.toSet, data.personalData, reply ) ).map{
           case ProfileCmdAccepted(pr) => generateJwt(pr,uuid)
           case _ => throw BadRequest("")
         }
