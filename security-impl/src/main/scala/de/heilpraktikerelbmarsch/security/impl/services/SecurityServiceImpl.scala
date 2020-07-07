@@ -53,6 +53,7 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
       .claim(CommonProfileDefinition.EMAIL,profile.email.map(_.value).orNull)
       .claim(CommonProfileDefinition.DISPLAY_NAME,profile.name.toString)
       .claim("entityId",entityId.toString)
+      .claim("displayName", profile.name.toString)
       .expirationTime(new DateTime().plusMinutes(30).toDate)
       .issueTime(new Date)
       .jwtID(profile.login).build()
