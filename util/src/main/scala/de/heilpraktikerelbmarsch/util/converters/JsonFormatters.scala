@@ -79,7 +79,7 @@ case object JsonFormatters {
     JsString(data.toString)
   }
 
-  implicit val jodaDateTimeWrites: Writes[DateTime] = {r => Json.toJson( r.toString(DateTimeFormat.longDateTime()) ) }
+  implicit val jodaDateTimeWrites: Writes[DateTime] = {r => Json.toJson( r.toString("dd.MM.yyyy HH:mm:ss S Z") ) }
   /*
 shortDate:         11/3/16
 shortDateTime:     11/3/16 4:25 AM
@@ -93,7 +93,8 @@ fullDateTime:      Thursday, November 3, 2016 4:25:35 AM Mountain Daylight Time
 
   implicit val jodaDateTimeReads: Reads[DateTime] = (r: JsValue) => {
     //    val formatter = DateTimeFormat.forPattern("dd. MMM yyyy HH:mm:ss z").withLocale(Locale.GERMANY)
-    val formatter = new SimpleDateFormat("MMM d, yyyy H:mm:ss a z")//E, dd MMM yyyy HH:mm:ss Z
+    //    val formatter = new SimpleDateFormat("MMM d, yyyy H:mm:ss a z")//E, dd MMM yyyy HH:mm:ss Z
+    val formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S Z")//E, dd MMM yyyy HH:mm:ss Z
     Try( new DateTime(formatter.parse(r.as[String])) )
       .map(result => JsSuccess(result))
       .recover(r => JsError(r.toString)).get
