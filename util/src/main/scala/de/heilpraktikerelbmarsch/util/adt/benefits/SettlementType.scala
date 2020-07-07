@@ -41,6 +41,9 @@ object SettlementType extends Enum[SettlementType] {
   case object BeihilfeST extends SettlementType("Landes-Beihilfe Sachsen-Anhalt","Landesbeamter","Beihilfe")
   case object BeihilfeSH extends SettlementType("Landes-Beihilfe Schleswig-Holstein","Landesbeamter","Beihilfe")
   case object BeihilfeTH extends SettlementType("Landes-Beihilfe Thüringen","Landesbeamter","Beihilfe")
+  case object Selbstzahler1 extends SettlementType("Selbstzahler 1", "Selbstzahler eigene Definition", "Alle")
+  case object Selbstzahler2 extends SettlementType("Selbstzahler 2", "Selbstzahler eigene Definition", "Alle")
+  case object Selbstzahler3 extends SettlementType("Selbstzahler 3", "Selbstzahler eigene Definition", "Alle")
 
   implicit val format: OFormat[SettlementType] = derived.oformat()
 
