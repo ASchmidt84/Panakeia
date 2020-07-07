@@ -2,10 +2,12 @@ package de.heilpraktikerelbmarsch.security.api.profiles
 
 import java.util.{Date, UUID}
 
+import de.heilpraktikerelbmarsch.util.adt.contacts.Operator
 import de.heilpraktikerelbmarsch.util.adt.security.DefaultRoles.{AdminRole, SuperAdminRole, SystemRole, TherapistRole}
 import org.joda.time.DateTime
 import org.pac4j.core.profile.CommonProfile
 
+import scala.language.implicitConversions
 import scala.util.{Success, Try}
 
 
@@ -33,6 +35,8 @@ case class PanakeiaJWTProfile() extends CommonProfile {
     Set(SystemRole.name).forall(e => set.contains(e))
   }
 
+  override def getDisplayName: String = Try(getAttribute("displayName").asInstanceOf[String]).getOrElse("UNKNOWN")
+
   def isSuperAdminProfile: Boolean = this.getRoles.asScala.toSet.contains(SuperAdminRole.name)
 
   def isAdminProfile: Boolean = this.getRoles.asScala.toSet.contains(AdminRole.name)
@@ -53,6 +57,11 @@ object PanakeiaJWTProfile {
     a.setLinkedId(commonProfile.getLinkedId)
     a
   }
+
+  implicit def toOperator(profile: PanakeiaJWTProfile): Operator = Operator(
+    profile.getUserEntityId.map(_.toString).getOrElse("UNKNOWN"),
+    profile.getDisplayName
+  )
 
 }
 
