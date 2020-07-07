@@ -59,6 +59,7 @@ trait SystemSecuredService {
       .subject("panakeia-internal")
       .claim("roles", ImmutableList.of(SystemRole.name))
       .claim("Microservice-Name",serviceName)
+      .claim("displayName",s"System: $serviceName")
       //      .claim("", Json.toJson(Map("" -> "")))
       .expirationTime(new DateTime().plusMinutes(30).toDate)
       .issueTime(new Date)
