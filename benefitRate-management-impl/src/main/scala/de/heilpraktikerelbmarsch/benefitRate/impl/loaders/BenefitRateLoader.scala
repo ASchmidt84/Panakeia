@@ -77,4 +77,8 @@ trait BenefitRateServiceComponents extends LagomServerComponents
 
 
 abstract class BenefitRateApplication(context: LagomApplicationContext)
-  extends LagomApplication(context) with BenefitRateServiceComponents
+  extends LagomApplication(context) with BenefitRateServiceComponents {
+
+  //TODO Init von standard BenefitRate´s damit ein Grundstock vorhanden ist
+
+}
