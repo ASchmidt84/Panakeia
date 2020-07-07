@@ -15,12 +15,12 @@ trait BenefitRateService extends Service {
 
   def setRate(number: String): ServiceCall[RateForm,BenefitRateView]
 
-  def deleteBenefitRate(number: String): ServiceCall[NotUsed,BenefitRateView]
+  def deleteBenefitRate(number: String): ServiceCall[String,Boolean]
 
-  def size(): ServiceCall[NotUsed,Long]
+  def size(active: Option[Boolean]): ServiceCall[NotUsed,Long]
 
-  def list(take: Long = 100,
-           drop: Long = 0): ServiceCall[NotUsed,Seq[BenefitRateView]]
+  def list(take: Int = 100,
+           drop: Int = 0): ServiceCall[NotUsed,Seq[BenefitRateView]]
 
   def search(query: String,
              take: Long,
@@ -34,7 +34,7 @@ trait BenefitRateService extends Service {
         restCall(Method.DELETE,path(":number"), deleteBenefitRate _),
         restCall(Method.PUT,path(":number/rate"), setRate _),
         restCall(Method.POST,path(""),createBenefitRate _),
-        pathCall(path("all/size"), size _ ),
+        pathCall(path("all/size?active"), size _ ),
         pathCall(path("all/list?take&drop"), list _),
         pathCall(path("all/search?query&take&drop"), search _)
       )

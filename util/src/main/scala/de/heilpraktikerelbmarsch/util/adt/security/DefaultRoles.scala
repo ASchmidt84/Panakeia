@@ -11,6 +11,11 @@ sealed abstract class DefaultRoles private[adt](val name: String) extends EnumEn
 object DefaultRoles extends Enum[DefaultRoles] {
   override def values: IndexedSeq[DefaultRoles] = findValues
 
+  val systemRoles = List(SystemRole)
+  val adminRoles = List(SuperAdminRole,AdminRole)
+  val praxisRoles = List(TherapistRole,AssistantRole)
+  val outsideRoles = List(PatientRole,ExternalRole)
+
   case object SystemRole extends DefaultRoles("system") //System intern
   case object SuperAdminRole extends DefaultRoles("super-admin") //Technischer Admin
   case object AdminRole extends DefaultRoles("admin") //Administrator

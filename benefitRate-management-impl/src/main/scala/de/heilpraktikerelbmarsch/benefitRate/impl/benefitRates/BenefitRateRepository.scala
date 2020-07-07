@@ -34,6 +34,19 @@ class BenefitRateRepository(database: Database)(implicit ec: ExecutionContext) {
 
   def search(input: String): Future[Seq[UUID]] = database.run(searchQuery(input.toLowerCase.trim)).map(_.map(_.actorId))
 
+  def list(take: Int, drop: Int): Future[Seq[UUID]] = database.run( table.take(take).drop(drop).sortBy(_.number.asc).map(_.actorId).result )
+
+  def searchByNumber(number: String): Future[Seq[UUID]] = database.run(table.filter(_.number.toLowerCase like s"%$number%" ).map(_.actorId).result)
+
+  def findByNumber(number: String): Future[Option[UUID]] = database.run(table.filter(_.number.toLowerCase === number.toLowerCase).map(_.actorId).result.headOption)
+
+  def length(active: Option[Boolean]): Future[Int] = {
+    val query = active.map{e =>
+      table.filter(d => d.active === e).length
+    }.getOrElse( table.length )
+    database.run( query.result )
+  }
+
 }
 
 

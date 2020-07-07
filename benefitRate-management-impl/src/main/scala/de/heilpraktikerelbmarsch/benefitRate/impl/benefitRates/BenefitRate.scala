@@ -53,13 +53,23 @@ object BenefitRate {
                               replyTo: ActorRef[Confirmation],
                               operator: Operator) extends Command
 
+  final case class Delete(reason: String,
+                          replyTo: ActorRef[Confirmation],
+                          operator: Operator) extends Command
+
+  final case class Restore(reason: String,
+                           operator: Operator,
+                           replyTo: ActorRef[Confirmation]) extends Command
+
   // Confirmations! also Replies! --------------------------------------------------------------------------------
 
   final case class Summary(number: String,
                            description: String,
                            isOfficialGebueH: Boolean,
                            alternativeForGOAE: Option[String],
-                           rates: Seq[Rate])
+                           rates: Seq[Rate],
+                           active: Boolean,
+                           deleted: Boolean)
 
   sealed trait Confirmation
   final case class CommandAccepted(summary: Summary) extends Confirmation
@@ -124,6 +134,18 @@ object BenefitRate {
 
   implicit val rateRemovedJson: OFormat[RateRemoved] = Json.format
 
+  final case class Deleted(reason: String,
+                           operator: Operator,
+                           timestamp: DateTime = DateTime.now()) extends Event
+
+  final case class Restored(reason: String,
+                            operator: Operator,
+                            timestamp: DateTime = DateTime.now()) extends Event
+
+
+  implicit val formatDeleted: OFormat[Deleted] = Json.format
+  implicit val formatRestored: OFormat[Restored] = Json.format
+
   // Events! ENDE ------------------------------------------------------------------------------------------------
 
   val empty: BenefitRate = BenefitRate("","",false,None,Nil)
@@ -150,12 +172,25 @@ object BenefitRate {
 
 }
 
+/**
+ * Leistungsatz
+ * The benefit rate is the payment rate for a given service or benefit.
+ * This BenefitRate describes a service and can contains multiple rates which determine which type
+ * this payment is for. Maybe 14 € for private payer and 12 € for an with Beihilfe
+ * @param number the number of the benefit rate
+ * @param description the description of the benefit
+ * @param isOfficialGebueH is this a official GebüH BenefitRate
+ * @param alternativeForGOAE Some means that this is an alternative for an GOÄ Number
+ * @param rates The rates (payments) for this benefit
+ * @param active is an active one or not
+ */
 final case class BenefitRate(number: String,
                              description: String,
                              isOfficialGebueH: Boolean,
                              alternativeForGOAE: Option[String],
                              rates: Seq[Rate],
-                             active: Boolean = true) {
+                             active: Boolean = true,
+                             deleted: Boolean = false) {
   import BenefitRate._
 
   def isNotInitialized: Boolean = this == empty
@@ -165,23 +200,45 @@ final case class BenefitRate(number: String,
     x.description,
     x.isOfficialGebueH,
     x.alternativeForGOAE,
-    x.rates.distinctBy(_.settlementType)
+    x.rates.distinctBy(_.settlementType),
+    x.active, x.deleted
   )
 
   private def reject(reply: ActorRef[Confirmation])(msg: String): ReplyEffect[Event,BenefitRate] = Effect.reply(reply)(CommandRejected(msg))
 
   def applyCommand(command: Command): ReplyEffect[Event,BenefitRate] = command match {
-    case x: Command if isNotInitialized => x match {
+    case x: Command if isNotInitialized && !deleted => x match {
       case CreateBenefitRate(number,desc,gebu,alternative,reply,operator) if isNotInitialized =>
         onCreate(number,desc,gebu,alternative,operator,reply)
       case _ => reject(x.replyTo)(s"Impossible! The entity is not initialized")
     }
-    case x: CreateBenefitRate => reject(x.replyTo)(s"I cannot create this on an existing entity with number ${this.number}")
-    case Deactivate(reply,op) => onDeactivate(op,reply)
-    case Reactivate(reply,op) => onActivate(op,reply)
-    case SetRate(rate,reply,operator) => onSetRate(rate,operator,reply)
-    case Get(reply) => Effect.reply(reply)(CommandAccepted(this))
-    case RemoveRate(rate,reply,op) => onRemoveRate(rate,op,reply)
+    case j if !deleted =>  j match {
+      case x: CreateBenefitRate => reject(x.replyTo)(s"I cannot create this on an existing entity with number ${this.number}")
+      case Deactivate(reply,op) => onDeactivate(op,reply)
+      case Reactivate(reply,op) => onActivate(op,reply)
+      case SetRate(rate,reply,operator) => onSetRate(rate,operator,reply)
+      case Get(reply) => Effect.reply(reply)(CommandAccepted(this))
+      case RemoveRate(rate,reply,op) => onRemoveRate(rate,op,reply)
+      case Delete(reason,reply,op) => onDelete(reason,op,reply)
+    }
+    case Restore(reason,op,reply) if !isNotInitialized => onRestore(reason,op,reply)
+    case j => reject(j.replyTo)("This entity was deleted or is not initialized")
+  }
+
+  private def onRestore(reason: String,
+                        operator: Operator,
+                        reply: ActorRef[Confirmation]): ReplyEffect[Event,BenefitRate] = {
+    Effect
+      .persist(Restored(reason,operator))
+      .thenReply(reply)(d => CommandAccepted(d))
+  }
+
+  private def onDelete(reason: String,
+                       operator: Operator,
+                       reply: ActorRef[Confirmation]): ReplyEffect[Event,BenefitRate] = {
+    Effect
+      .persist( Deactivated(operator), Deleted(reason,operator) )
+      .thenReply(reply)(s => CommandAccepted(s) )
   }
 
   private def onRemoveRate(rate: Rate,
@@ -232,6 +289,8 @@ final case class BenefitRate(number: String,
     case Deactivated(_,_) => onActiveChange(false)
     case RateSet(rate,_,_) => onRateSet(rate)
     case RateRemoved(rate,_,_) => onRateRemoved(rate)
+    case Deleted(_,_,_) => copy(deleted = true)
+    case Restored(_,_,_) => copy(deleted = false)
   }
 
   private def onRateSet(rate: Rate): BenefitRate = {
@@ -267,6 +326,8 @@ object SerializerRegistry extends JsonSerializerRegistry {
     JsonSerializer[Reactivated],
     JsonSerializer[Deactivated],
     JsonSerializer[RateSet],
-    JsonSerializer[RateRemoved]
+    JsonSerializer[RateRemoved],
+    JsonSerializer[Deleted],
+    JsonSerializer[Restored]
   )
 }
