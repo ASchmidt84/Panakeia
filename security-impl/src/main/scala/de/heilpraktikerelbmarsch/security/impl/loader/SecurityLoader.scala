@@ -100,7 +100,7 @@ trait SecurityServiceComponents extends LagomServerComponents
             case a => s"a: $a"
           }
         case Some(id) =>
-          clusterSharding.entityRefFor(Profile.typedKey,id.toString).ask(reply => Get(reply) )(5.seconds).map{
+          clusterSharding.entityRefFor(Profile.typedKey,id.toString).ask[ProfileConfirmation](reply => Get(reply) )(5.seconds).map{
             case ProfileCmdAccepted(d) => d.toString
             case ProfileCmdRejected(d) => d
           }
