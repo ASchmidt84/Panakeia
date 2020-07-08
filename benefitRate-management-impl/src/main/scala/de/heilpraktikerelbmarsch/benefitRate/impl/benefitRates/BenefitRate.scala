@@ -220,6 +220,7 @@ final case class BenefitRate(number: String,
       case Get(reply) => Effect.reply(reply)(CommandAccepted(this))
       case RemoveRate(rate,reply,op) => onRemoveRate(rate,op,reply)
       case Delete(reason,reply,op) => onDelete(reason,op,reply)
+      case j => reject(j.replyTo)("This entity was deleted or is not initialized")
     }
     case Restore(reason,op,reply) if !isNotInitialized => onRestore(reason,op,reply)
     case j => reject(j.replyTo)("This entity was deleted or is not initialized")
