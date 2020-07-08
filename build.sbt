@@ -138,6 +138,25 @@ lazy val `patient-management-api` = (project in file("patient-management-api"))
   )
   .dependsOn(`util`)
 
+lazy val `patient-management-impl` = (project in file("patient-management-impl"))
+  .enablePlugins(LagomScala,LauncherJarPlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslPersistenceJdbc,
+      lagomScaladslTestKit,
+      lagomScaladslKafkaBroker,
+      macwire,
+      scalaTest,
+      playJsonDerivedCodecs,
+      lagomScaladslAkkaDiscovery,
+      postgresDriver
+    )
+  )
+  .settings(dockerSettings: _*)
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`patient-management-api`,`security-api`)
+
+
 lazy val `benefitRate-management-api` = (project in file("benefitRate-management-api"))
   .settings(
     libraryDependencies ++= Seq(
