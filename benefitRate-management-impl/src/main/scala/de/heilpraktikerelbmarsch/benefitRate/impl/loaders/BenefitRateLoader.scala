@@ -121,33 +121,38 @@ abstract class BenefitRateApplication(context: LagomApplicationContext)
     val futSeq = reader.iteratorWithHeaders.map{row =>
       val number = row(numberKey)
       println(s"Row data with number $number")
-      val id = UUID.randomUUID()
-      val createFut = clusterSharding.entityRefFor(BenefitRate.typedKey,id.toString).ask[Confirmation](reply => BenefitRate.CreateBenefitRate(
-        number,
-        row(descriptionKey),
-        true,
-        None,
-        reply,
-        SystemOperator(BenefitRateServiceIdentifier.name)
-      ))
-      createFut.flatMap{
-        case CommandAccepted(_) =>
-          val rates = Seq(
-            Option( row(pkvKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble),SettlementType.PKV1) ),
-            Option( row(postBKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), SettlementType.PBKK ) ),
-            Option( row(gebUEHKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), SettlementType.SZGebueH ) ),
-            Option( row(szKEy) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble*1.1), SettlementType.SZPauschal ) )
-          ) ++
-          SettlementType.allBeihilfe.map(settlementType =>
-            Option( row(beihilfeKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), settlementType ) )
-          )
-          Future.sequence(rates.filter(_.isDefined).map{u =>
-            clusterSharding.entityRefFor(BenefitRate.typedKey,id.toString).ask[Confirmation](r => BenefitRate.SetRate(u.get,r,SystemOperator(BenefitRateServiceIdentifier.name)))
-          }).map{u =>
-            u.map(i => s"$number imported: ${i.toString}\n").mkString("------------------\n\n")
+
+      globalRepository.findByNumber(number).flatMap{
+        case Some(_) => Future.successful( s"$number already exists" )
+        case _ =>
+          val id = UUID.randomUUID()
+          val createFut = clusterSharding.entityRefFor(BenefitRate.typedKey,id.toString).ask[Confirmation](reply => BenefitRate.CreateBenefitRate(
+            number,
+            row(descriptionKey),
+            true,
+            None,
+            reply,
+            SystemOperator(BenefitRateServiceIdentifier.name)
+          ))
+          createFut.flatMap{
+            case CommandAccepted(_) =>
+              val rates = Seq(
+                Option( row(pkvKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble),SettlementType.PKV1) ),
+                Option( row(postBKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), SettlementType.PBKK ) ),
+                Option( row(gebUEHKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), SettlementType.SZGebueH ) ),
+                Option( row(szKEy) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble*1.1), SettlementType.SZPauschal ) )
+              ) ++
+                SettlementType.allBeihilfe.map(settlementType =>
+                  Option( row(beihilfeKey) ).filter(_.trim.nonEmpty).map(i => Rate(EUR(i.replace(",",".").toDouble), settlementType ) )
+                )
+              Future.sequence(rates.filter(_.isDefined).map{u =>
+                clusterSharding.entityRefFor(BenefitRate.typedKey,id.toString).ask[Confirmation](r => BenefitRate.SetRate(u.get,r,SystemOperator(BenefitRateServiceIdentifier.name)))
+              }).map{u =>
+                u.map(i => s"$number imported: ${i.toString}\n").mkString("------------------\n\n")
+              }
+            case CommandRejected(error) =>
+              Future.successful(error)
           }
-        case CommandRejected(error) =>
-          Future.successful(error)
       }
     }
 
