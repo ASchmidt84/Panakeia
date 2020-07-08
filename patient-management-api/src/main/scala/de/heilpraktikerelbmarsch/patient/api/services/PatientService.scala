@@ -3,22 +3,23 @@ package de.heilpraktikerelbmarsch.patient.api.services
 import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.transport.{Method, NotFound}
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceAcl, ServiceCall}
-import de.heilpraktikerelbmarsch.patient.api.adt.PatientView
-import de.heilpraktikerelbmarsch.patient.api.request.PatientSearchForm
+import de.heilpraktikerelbmarsch.patient.api.adt.{PatientStatus, PatientView}
+import de.heilpraktikerelbmarsch.patient.api.request.{PatientPhoneForm, PatientSearchForm}
+import de.heilpraktikerelbmarsch.util.adt.contacts.{EmailAddress, PersonalData, PostalAddress}
 import de.heilpraktikerelbmarsch.util.adt.security.MicroServiceIdentifier.PatientServiceIdentifier
 
 trait PatientService extends Service {
 
   /**
    * Creates a new patient
-   * @return a [[PatientView]]
+   * @return a [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]
    */
   def createPatient(): ServiceCall[NotUsed,PatientView]
 
   /**
    * Get a patient by his patient number which is unique!
    * @param number patient number unique
-   * @return returns a [[PatientView]] in case of found
+   * @return returns a [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]] in case of found
    *         otherwise a [[com.lightbend.lagom.scaladsl.api.transport.NotFound]]
    */
   def getPatientByPatientNumber(number: String): ServiceCall[NotUsed,PatientView]
@@ -27,9 +28,65 @@ trait PatientService extends Service {
    * Searches for patients
    * @param take maximum number of results
    * @param drop drops the first n results
-   * @return a sequence of [[PatientView]]. Size 0 if nothing was found
+   * @return a sequence of [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]. Size 0 if nothing was found
    */
   def searchPatient(take: Int, drop: Int): ServiceCall[PatientSearchForm,Seq[PatientView]]
+
+  /**
+   * Changes the status of an patient
+   * @param number required number to change the patient status
+   * @return [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]
+   */
+  def changePatientStatus(number: String): ServiceCall[PatientStatus,PatientView]
+
+  /**
+   * Changes the postal address of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def changePatientPostalAddress(number: String): ServiceCall[PostalAddress,PatientView]
+
+  /**
+   * Changes the personal data of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def changePatientPersonalData(number: String): ServiceCall[PersonalData,PatientView]
+
+  /**
+   * Changes the email of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def changePatientEmailAddress(number: String): ServiceCall[EmailAddress,PatientView]
+
+  /**
+   * Changes the job of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def changePatientJob(number: String): ServiceCall[String,PatientView]
+
+  /**
+   * Changes the phone data of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def changePatientPhoneData(number: String): ServiceCall[PatientPhoneForm,PatientView]
+
+  /**
+   * Clears the job of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def clearPatientJob(number: String): ServiceCall[NotUsed,PatientView]
+
+  /**
+   * Clears the email address of an patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def clearPatientEmailAddress(number: String): ServiceCall[NotUsed,PatientView]
 
 
   override final def descriptor: Descriptor = {
@@ -37,7 +94,15 @@ trait PatientService extends Service {
     named(PatientServiceIdentifier.name)
       .withCalls(
         restCall(Method.POST, path("search?take&drop"), searchPatient _),
-        restCall(Method.GET, path("?number"), getPatientByPatientNumber _),
+        restCall(Method.GET, path(":number"), getPatientByPatientNumber _),
+        restCall(Method.PUT,path(":number/status"), changePatientStatus _),
+        restCall(Method.PUT,path(":number/postal-address"), changePatientPostalAddress _),
+        restCall(Method.PUT,path(":number/personal-data"), changePatientPersonalData _),
+        restCall(Method.PUT,path(":number/email"), changePatientEmailAddress _),
+        restCall(Method.DELETE,path(":number/email"), clearPatientEmailAddress _),
+        restCall(Method.PUT,path(":number/job"), changePatientJob _),
+        restCall(Method.DELETE,path(":number/job"), clearPatientJob _),
+        restCall(Method.PUT,path(":number/phone-data"), changePatientPhoneData _),
         restCall(Method.POST,path(""), createPatient _)
       )
       .withAutoAcl(true)
