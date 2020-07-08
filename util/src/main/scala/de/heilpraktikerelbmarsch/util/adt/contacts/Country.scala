@@ -4,6 +4,8 @@ import java.util.Locale
 
 import play.api.libs.json.{Format, Json}
 
+import scala.language.implicitConversions
+
 /**
 * Country
 * @param isoCode
