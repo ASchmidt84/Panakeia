@@ -92,8 +92,6 @@ trait BenefitRateServiceComponents extends LagomServerComponents
 abstract class BenefitRateApplication(context: LagomApplicationContext)
   extends LagomApplication(context) with BenefitRateServiceComponents {
 
-  //TODO Init von standard BenefitRate´s damit ein Grundstock vorhanden ist
-
   import net.ceedubs.ficus.Ficus._
 
   importBaseData(config.as[String]("init.csv.gebüh"))
