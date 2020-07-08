@@ -111,7 +111,7 @@ fullDateTime:      Thursday, November 3, 2016 4:25:35 AM Mountain Daylight Time
       .recover(r => JsError(r.toString)).get
   }
 
-  implicit val jodaLocalDateFormat: Format[DateTime] = Format(jodaLocalDateReads,jodaLocalDateWrites)
+  implicit val jodaLocalDateFormat: Format[LocalDate] = Format(jodaLocalDateReads,jodaLocalDateWrites)
 
   implicit val moneyTypeFormat: Format[Money] = (
     (JsPath \ "value").format[BigDecimal] and
