@@ -47,4 +47,24 @@ object SettlementType extends Enum[SettlementType] {
 
   implicit val format: OFormat[SettlementType] = derived.oformat()
 
+  val allBeihilfe: Seq[SettlementType] = Seq(
+    BeihilfeBW,
+    BeihilfeBY,
+    BeihilfeBE,
+    BeihilfeBB,
+    BeihilfeHB,
+    BeihilfeHH,
+    BeihilfeHE,
+    BeihilfeMV,
+    BeihilfeNI,
+    BeihilfeNRW,
+    BeihilfeRP,
+    BeihilfeSL,
+    BeihilfeSN,
+    BeihilfeST,
+    BeihilfeSH,
+    BeihilfeTH,
+    Bundeshilfe
+  )
+
 }

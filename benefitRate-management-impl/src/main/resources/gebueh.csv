@@ -1,0 +1,150 @@
+﻿Ziffer;Leistungsbeschreibung;PKV;Beihilfe;Post B;GebüH;SZ
+1;Eingehende Untersuchung; 13,41 ; 13,41 ; 11,08 ; 20,50 ; 20,50 
+2;Homöopathische (Folge-)Repertorisation; 41,00 ; 120,70 ; 15,40 ; 41,00 ; 41,00 
+3;Kurze Information; 3,15 ; 3,15 ; 2,63 ; 4,50 ; 4,50 
+4;Eingehende Beratung; 20,10 ; 20,11 ; 16,40 ; 22,00 ; 22,00 
+5;Beratung; 10,72 ; 10,20 ; 8,20 ; 20,50 ; 20,50 
+6;Beratung außerhalb der Sprechstunde; 14,80 ; 14,80 ; 12,93 ; 24,50 ; 24,50 
+7;Beratung nachts; 21,21 ; 21,21 ; 19,34 ; 28,50 ; 28,50 
+8;Beratung Sonn- und Feiertags; 23,54 ; 23,54 ; 15,40 ; 27,00 ; 27,00 
+9.1;Hausbesuch; 29,50 ; 29,50 ; 21,50 ; 29,50 ; 29,50 
+9.2;Hausbesuch (Eilbesuch); 32,00 ; 32,00 ; 24,00 ; 32,00 ; 32,00 
+9.3;Hausbesuch (Nacht); 36,50 ; 36,50 ; 27,50 ; 36,50 ; 36,50 
+10.1;Wegegeld bei Tag pro Std. bis 2 km; 3,58 ; 5,50 ; 3,58 ; 5,50 ; 5,50 
+10.2;Wegegeld bei Nacht pro Std. bis 2 km; 7,16 ; 10,50 ; 7,16 ; 10,50 ; 10,50 
+10.3;Auslagen öffentliche Verkehrsmittel; 0,00 ; 0,00 ; 0,00 ;;
+10.5;km-Geld bei Tag ab 2 km pro km; 1,25 ; 1,25 ; 1,25 ; 1,25 ; 1,25 
+10.6;km-Geld bei Nacht ab 2 km pro km; 2,50 ; 2,50 ; 2,50 ; 2,50 ; 2,50 
+10.7;ab 25 km einfache Fahrt; 0,25 ; 0,25 ; 0,25 ; 0,25 ; 0,25 
+10.8;Reiseentschädigung bei mehr als 6 Std.; 10,50 ; 20,50 ; 10,50 ; 20,50 ; 20,50 
+11.1;Kurze Krankenbescheinigung; 5,36 ; 5,36 ; 0,00 ; 15,50 ; 15,50 
+11.2;Befundbericht; 17,43 ; 10,30 ; 10,30 ; 20,50 ; 20,50 
+11.3;Diätplan; 9,40 ; 9,38 ; 7,75 ; 26,00 ; 26,00 
+12.1;Harnuntersuchung qualitativ; 3,35 ; 3,10 ; 3,10 ; 3,10 ; 3,10 
+12.2;Harnuntersuchung quantitativ; 5,36 ; 4,60 ; 4,60 ; 4,60 ; 4,60 
+12.4;Harnsediment; 3,35 ; 4,60 ; 3,35 ; 4,60 ; 4,60 
+12.5;Carcinochrom-Reaktion; *) ; 17,90 ; 17,90 ; 17,90 ; 17,90 
+12.7;Blutstatus; 12,75 ; 12,06 ; 12,07 ; 18,00 ; 18,00 
+12.8;Blutzucker reflektorisch; 2,68 ; 2,68 ; 2,68 ; 8,00 ; 8,00 
+12.9;Hb-Bestimmung; 4,03 ; 4,02 ; 4,03 ; 5,50 ; 5,50 
+12.10;Differenzierung des Blutausstriches; 8,05 ; 7,70 ; 7,70 ; 7,70 ; 7,70 
+12.11;Zählung der Leuko- u. Erythrozyten; 5,50 ; 5,36 ; 5,38 ; 5,50 ; 5,50 
+12.12;Blutsenkungsgeschwindigkeit; 4,03 ; 4,02 ; 4,03 ; 6,00 ; 6,00 
+12.13;mikroskopische bzw. chemische Untersuchung; 6,71 ; 6,70 ; 6,70 ; 9,50 ; 9,50 
+12.14;Aufwendige Chemogramme von Körperflüssigkeiten und Ausscheidungen je nach Umfang;;;;12,5;12,5
+12.15;Photometrie; 2,01 ; 5,36 ; 0,00 ; 10,50 ; 10,50 
+13.1;Sonstige Blutuntersuchungen; 8,05 ; 8,04 ; 8,04 ; 31,00 ; 31,00 
+14.1;Untersuchung Augenvordergrund; 9,91 ; 9,92 ; 5,20 ; 10,50 ; 10,50 
+14.2;Untersuchung Augenhintergrund; 20,38 ; 10,20 ; 5,20 ; 10,50 ; 10,50 
+14.3;Grundumsatzbestimmung nach Read; 5,91 ; 5,90 ; 4,86 ; 8,00 ; 8,00 
+14.4;Grundumsatzbestimmung: Atemgasuntersuchung; 12,69 ; 23,82 ; 10,30 ; 26,00 ; 26,00 
+14.5;Spirometrische Untersuchung; 7,97 ; 7,97 ; 6,65 ; 20,50 ; 20,50 
+14.6;EKG vollständiges Programm; 26,55 ; 51,50 ; 26,00 ; 51,50 ; 51,50 
+14.7 A;EKG bis 8 Ableitungen; 15,95 ; 15,95 ; 13,25 ; 31,00 ; 31,00 
+14.7 B;EKG ab 9 Ableitungen; 26,55 ; 26,54 ; 20,50 ; 51,50 ; 51,50 
+14.8;Oszillografische Untersuchung; 13,32 ; 13,32 ; 5,20 ; 25,50 ; 25,50 
+14.9;Herz-Kreislauf-Untersuchung n. Schellong; 9,80 ; 9,79 ; 8,08 ; 25,50 ; 25,50 
+14.10;Gefässdoppler Untersuchung; 11,30 ; 11,30 ; 11,30 ; 11,30 ; 11,30 
+15.1;Photoaufnahmen schwarz-weis; 0,00 ; 0,00 ; 0,00 ; 15,50 ; 15,50 
+15.2;Vergrösserungen u. Farbaufnahmen; 0,00 ; 0,00 ; 0,00 ; 15,50 ; 15,50 
+16.1;Elektro-Neural-Diagnostik;; 0,00 ; 0,00 ; 26,00 ; 26,00 
+16.2;Segmentdiagnostik;; 20,50 ; 0,00 ; 20,50 ; 20,50 
+16.3;Bioelektrische Funktionsdiagnostik;; 0,00 ; 0,00 ; 41,00 ; 41,00 
+16.4;Hautwiderstandsmessung;; 26,00 ; 0,00 ; 26,00 ; 26,00 
+17.1;Neurologische Untersuchungen; 26,00 ; 26,00 ; 5,20 ; 26,00 ; 26,00 
+18.1;Heilmagnetische Behandlung;; 0,00 ; 0,00 ; 10,50 ; 10,50 
+18.2;Heilmagnetische Behandlung; 10,50 ; 0,00 ; 0,00 ; 26,00 ; 26,00 
+19.1;Psychotherapie bis 30 Min. Dauer; 0,00 ; 0,00 ; 0,00 ; 26,00 ; 26,00 
+19.2;Psychotherapie bis 90 Min. Dauer; 0,00 ; 0,00 ; 0,00 ; 46,00 ; 46,00 
+19.3;Psychotherapeutischer Befund; 0,00 ; 0,00 ; 0,00 ; 38,50 ; 38,50 
+19.4;Psychotherapeutisches Gutachten; 0,00 ; 0,00 ; 0,00 ; 15,50 ; 15,50 
+19.5;Psychologische Exploration; 0,00 ; 0,00 ; 0,00 ; 46,00 ; 46,00 
+19.6;Anwendung verschied. Testverfahren; 0,00 ; 0,00 ; 0,00 ; 38,50 ; 38,50 
+19.7;Behandlung der Sprechorgane; 0,00 ; 0,00 ; 0,00 ; 31,00 ; 31,00 
+19.8;Heilhypnose; 0,00 ; 0,00 ; 0,00 ; 26,00 ; 26,00 
+20.1;Atemtherapie; 8,91 ; 8,92 ; 7,43 ; 31,00 ; 31,00 
+20.2;Nervenpunktmassage; 6,82 ; 6,82 ; 5,69 ; 15,50 ; 15,50 
+20.3;Bindegewebsmassage; 6,82 ; 6,82 ; 5,69 ; 20,50 ; 20,50 
+20.4;Teilmassage; 4,72 ; 4,72 ; 3,93 ; 10,50 ; 10,50 
+20.5;Großmassage; 6,82 ; 6,82 ; 5,69 ; 18,00 ; 18,00 
+20.6 a;Unterwasser-Druckstrahl-Massage; 9,86 ; 9,86 ; 8,22 ; 20,50 ; 20,50 
+20.6 b;Lymphdrainage; 6,82 ; 6,82 ; 5,69 ; 20,50 ; 20,50 
+20.6 c;Schrägbettbehandlung; 6,82 ; 6,82 ; 5,69 ; 20,50 ; 20,50 
+20.7;Medikomechanische Behandlung; 7,34 ; 7,34 ; 6,12 ; 26,00 ; 26,00 
+20.8;Einreibung zu therapeutischen Zwecken; 0,00 ; 4,80 ; 3,93 ; 8,00 ; 8,00 
+21.1;Akupunktur Nadelstichtechnik; 26,00 ; 26,00 ; 10,30 ; 26,00 ; 26,00 
+21.2;Moxabehandlung; 8,05 ; 8,04 ; 5,20 ; 15,50 ; 15,50 
+22.1;Inhalation; 4,00 ; 3,99 ; 3,32 ; 13,00 ; 13,00 
+23.1;Aerosole; 9,02 ; 9,02 ; 5,20 ; 15,50 ; 15,50 
+24.1;Eigenblutinjektion; 12,08 ; 12,07 ; 9,98 ; 13,00 ; 13,00 
+24.2;Eigenharninjektion; 0,00 ; 13,00 ; 5,20 ; 13,00 ; 13,00 
+25.1;Injektion, subkutan/ intrakutan; 5,20 ; 5,20 ; 4,43 ; 5,20 ; 5,20 
+25.2;Injektion, intramuskulär; 5,20 ; 5,20 ; 4,43 ; 5,20 ; 5,20 
+25.3;Injektion, intravenös/ intraarteriell; 7,70 ; 7,70 ; 7,70 ; 7,70 ; 7,70 
+25.4;Quaddelbehandlung; 8,05 ; 8,04 ; 6,65 ; 13,00 ; 13,00 
+25.5;Injektion intraartikulär; 12,74 ; 12,74 ; 5,20 ; 15,50 ; 15,50 
+25.6;Neuraltherapie nach Hunecke; 17,43 ; 12,74 ; 7,70 ; 26,00 ; 26,00 
+25.7;Infusion intravenös; 8,70 ; 8,70 ; 8,70 ; 8,70 ; 8,70 
+25.8;Dauertropfinfusion; 12,80 ; 24,20 ; 12,80 ; 12,80 ; 12,80 
+25.9;Ozon-Sauerstoff-Injektion i.m.; 0,00 ; 13,00 ; 7,70 ; 13,00 ; 13,00 
+25.10;Ozon-Sauerstoff-Injektion intraarteriell; 0,00 ; 10,72 ; 8,85 ; 26,00 ; 26,00 
+25.11;HOT oder ähnliche Behandlungen; *) ; 0,00 ; 0,00 ; 51,00 ; 51,00 
+26.1;Blutentnahme; 3,60 ; 3,60 ; 3,50 ; 3,60 ; 3,60 
+26.2;Aderlaß; 12,80 ; 14,80 ; 12,18 ; 12,80 ; 12,80 
+27.1;Blutegelbehandlung; 5,91 ; 5,90 ; 4,86 ; 31,00 ; 31,00 
+27.2;Skarifikation der Haut; 0,00 ; 4,69 ; 3,88 ; 10,50 ; 10,50 
+27.3;Schröpfen unblutig; 5,91 ; 5,90 ; 4,86 ; 8,00 ; 8,00 
+27.4;Schröpfen blutig; 5,91 ; 5,90 ; 4,86 ; 20,50 ; 20,50 
+27.5;Schröpfkopfmassage; 5,91 ; 5,90 ; 4,86 ; 10,50 ; 10,50 
+27.6;Anwendung von Saugapparaten; 5,91 ; 5,90 ; 4,86 ; 26,00 ; 26,00 
+27.7;Fontanellen;; 6,17 ; 5,09 ; 15,50 ; 15,50 
+27.8;Cantharidenblasen;; 6,03 ; 4,98 ; 10,50 ; 10,50 
+27.9;Reinjektion des Blaseninhalts;; 5,36 ; 4,43 ; 10,50 ; 10,50 
+27.10;Anwendung von Pustulantien;; 6,03 ; 4,98 ; 10,50 ; 10,50 
+27.11;Baunscheidtbehandlung;; 20,50 ; 6,65 ; 20,50 ; 20,50 
+27.12;Biersche Stauung;; 6,03 ; 4,98 ; 8,00 ; 8,00 
+28.1;Paravertebrale Infiltration einmalig; 10,72 ; 10,72 ; 7,70 ; 15,50 ; 15,50 
+28.2;Paravertebrale Infiltration mehrmalig; 17,43 ; 17,43 ; 10,30 ; 20,50 ; 20,50 
+29.1;Mandelabsaugen; 5,91 ; 5,90 ; 4,86 ; 15,00 ; 15,00 
+30.1;Ohrspülung; 6,03 ; 6,03 ; 4,98 ; 15,50 ; 15,50 
+30.2;Beutelbegasung; 0,00 ; 36,00 ; 3,32 ; 36,00 ; 36,00 
+31.1;Abszeßeröffnung; 10,72 ; 10,72 ; 5,20 ; 13,00 ; 13,00 
+31.2;Entfernung von Aknepusteln; 10,05 ; 10,05 ; 5,20 ; 10,50 ; 10,50 
+32.1;Wundversorgung einer kl. Wunde; 9,38 ; 9,38 ; 5,20 ; 10,50 ; 10,50 
+32.2;Wundversorgung einer gr. Wunde; 15,50 ; 15,50 ; 10,30 ; 15,50 ; 15,50 
+33.1;Verbände einfach; 6,03 ; 6,03 ; 4,98 ; 15,50 ; 15,50 
+33.2;Verbände elastisch; 8,72 ; 8,71 ; 5,20 ; 15,50 ; 15,50 
+33.3;Verbände Kompression; 12,74 ; 12,74 ; 5,20 ; 13,00 ; 13,00 
+34.1;Chiropraktischer Eingriff einfach, unspezifisch; 4,97 ; 4,96 ; 4,10 ; 18,00 ; 18,00 
+34.2;Chiropraktischer Eingriff gezielt; 18,00 ; 19,00 ; 15,40 ; 18,00 ; 18,00 
+35.1;Osteopathie Unterkiefer; 13,41 ; 13,41 ; 7,70 ; 15,50 ; 15,50 
+35.2;Osteopathie Schultergelenk, HWS, BWS, LWS, ISG; 26,00 ; 26,00 ; 15,40 ; 26,00 ; 26,00 
+35.3;Osteopathie Hand, Ober-/Unterschenkel, Oberarm, Fuß; 26,00 ; 26,00 ; 15,40 ; 26,00 ; 26,00 
+35.4;Osteopathie Schlüsselbein, Knie; 14,88 ; 14,88 ; 5,20 ; 15,50 ; 15,50 
+35.5;Osteopathie Daumen; 13,00 ; 13,00 ; 5,20 ; 13,00 ; 13,00 
+35.6;Osteopathie Finger, Zehen; 12,47 ; 12,47 ; 5,20 ; 13,00 ; 13,00 
+36.1;Medizinisches Vollbad; 7,97 ; 7,97 ; 5,20 ; 15,50 ; 15,50 
+36.2;Medizinische Teilbad; 4,82 ; 4,83 ; 4,02 ; 8,00 ; 8,00 
+36.3;Darmbad; 15,73 ; 15,74 ; 7,70 ; 23,00 ; 23,00 
+36.4;Kneipp`sche Güsse; 4,82 ; 4,83 ; 4,02 ; 8,00 ; 8,00 
+37.1;Teilheißluft; 3,46 ; 3,46 ; 2,88 ; 8,00 ; 8,00 
+37.2;Ganzheißluft; 5,35 ; 5,35 ; 4,46 ; 10,50 ; 10,50 
+37.3;Heißluftkasten; 5,35 ; 5,35 ; 4,46 ; 10,50 ; 10,50 
+37.4;Vierzellenbad; 4,82 ; 4,83 ; 4,02 ; 13,00 ; 13,00 
+37.5;Stangerbad; 9,54 ; 9,55 ; 7,70 ; 13,00 ; 13,00 
+38.1;Fangopackung; 3,67 ; 3,67 ; 3,06 ; 15,50 ; 15,50 
+38.2;Paraffinpackung örtlich; 3,67 ; 3,67 ; 3,06 ; 15,50 ; 15,50 
+38.3;Paraffinpackung ganz; 3,67 ; 3,67 ; 3,06 ; 23,00 ; 23,00 
+38.4;Kneipwickel; 3,67 ; 3,67 ; 3,06 ; 31,00 ; 31,00 
+39.01;Lichtbestrahlung; 3,26 ; 3,25 ; 2,72 ; 8,00 ; 8,00 
+39.02;Ganzbestrahlung; 9,54 ; 9,55 ; 7,70 ; 10,50 ; 10,50 
+39.04;Faradisation; 5,04 ; 5,04 ; 4,20 ; 15,50 ; 15,50 
+39.05;Influenzmaschine; 0,00 ; 5,04 ; 4,20 ; 10,50 ; 10,50 
+39.06;Infrarot-Bestrahlung; 4,19 ; 4,20 ; 3,50 ; 8,00 ; 8,00 
+39.07;Verschorfung m. heißer Luft/ Dämpfen; 10,19 ; 10,19 ; 8,42 ; 10,50 ; 10,50 
+39.08;Hochfrequenzbehandlung; 3,89 ; 3,88 ; 3,24 ; 15,50 ; 15,50 
+39.09;Mikrowellenbehandlung; 3,89 ; 3,88 ; 3,24 ; 18,00 ; 18,00 
+39.10;Magnetfeldbehandlung;; 0,00 ; 0,00 ; 20,50 ; 20,50 
+39.11;Elektromech./ -therm. Behandlung; 5,04 ; 5,04 ; 4,20 ; 31,00 ; 31,00 
+39.12;Reizstrombehandlung; 5,04 ; 5,04 ; 4,20 ; 26,00 ; 26,00 
+39.13;Ultraschallbehandlung; 4,63 ; 4,62 ; 3,84 ; 15,50 ; 15,50 

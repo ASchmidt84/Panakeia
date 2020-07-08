@@ -55,7 +55,8 @@ lagomCassandraEnabled in ThisBuild := false
 lazy val `panakeia` = (project in file("."))
   .aggregate(
     `security-api`, `security-impl`,
-    `binary-management-api`,`binary-management-impl`
+    `binary-management-api`,`binary-management-impl`,
+    `benefitRate-management-api`, `benefitRate-management-impl`
   )
 
 
@@ -183,6 +184,7 @@ lazy val `util` = (project in file("util"))
       "org.apache.commons" % "commons-lang3" % "3.9",
       "com.github.t3hnar" %% "scala-bcrypt" % "4.1",
       "com.iheart" %% "ficus" % "1.4.7",
-      "joda-time" % "joda-time" % "2.10.6"
+      "joda-time" % "joda-time" % "2.10.6",
+      "com.github.tototoshi" %% "scala-csv" % "1.3.6"
     )
   )
