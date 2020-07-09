@@ -1,6 +1,7 @@
 package de.heilpraktikerelbmarsch.patient.api.services
 
 import akka.NotUsed
+import com.lightbend.lagom.scaladsl.api.deser.PathParamSerializer
 import com.lightbend.lagom.scaladsl.api.transport.{Method, NotFound}
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceAcl, ServiceCall}
 import de.heilpraktikerelbmarsch.patient.api.adt.{PatientStatus, PatientView}
@@ -8,7 +9,11 @@ import de.heilpraktikerelbmarsch.patient.api.request.{PatientPhoneForm, PatientS
 import de.heilpraktikerelbmarsch.util.adt.contacts.{EmailAddress, PersonalData, PostalAddress}
 import de.heilpraktikerelbmarsch.util.adt.security.MicroServiceIdentifier.PatientServiceIdentifier
 
+import scala.collection.immutable
+
 trait PatientService extends Service {
+
+  import PatientStatus._
 
   /**
    * Creates a new patient
@@ -31,6 +36,23 @@ trait PatientService extends Service {
    * @return a sequence of [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]. Size 0 if nothing was found
    */
   def searchPatient(take: Int, drop: Int): ServiceCall[PatientSearchForm,Seq[PatientView]]
+
+  /**
+   * Counts all patient by this status
+   * @param status status which the patient must have
+   * @return [[Int]] represents the counted patients in database
+   */
+  def length(status: PatientStatus): ServiceCall[NotUsed,Int]
+
+
+  /**
+   * Lists all patient with defined status
+   * @param take The maximum size for this list
+   * @param drop drops this number at the front of the founded list
+   * @param status the defined status which a patient must have
+   * @return a sequence of [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]. Size 0 if nothing was found
+   */
+  def listPatient(take: Int, drop: Int, status: PatientStatus): ServiceCall[NotUsed,Seq[PatientView]]
 
   /**
    * Changes the status of an patient
@@ -89,10 +111,23 @@ trait PatientService extends Service {
   def clearPatientEmailAddress(number: String): ServiceCall[NotUsed,PatientView]
 
 
+  implicit val pathParamSerializerPatientStatus: PathParamSerializer[PatientStatus] = new PathParamSerializer[PatientStatus] {
+    override def serialize(parameter: PatientStatus): Seq[String] = immutable.Seq(parameter.name)
+
+    override def deserialize(parameters: Seq[String]): PatientStatus = parameters.headOption match {
+      case Some(i) => PatientStatus.withName(i)
+      case _ => throw new IllegalArgumentException("Patientstatus needs an parameter as string")
+    }
+  }
+
+
   override final def descriptor: Descriptor = {
     import Service._
     named(PatientServiceIdentifier.name)
       .withCalls(
+        restCall(Method.POST, path("search?take&drop"), searchPatient _),
+        restCall(Method.GET, path("length?status"), length _),
+        restCall(Method.GET, path("list?take&drop&status"), listPatient _),
         restCall(Method.POST, path("search?take&drop"), searchPatient _),
         restCall(Method.GET, path(":number"), getPatientByPatientNumber _),
         restCall(Method.PUT,path(":number/status"), changePatientStatus _),
