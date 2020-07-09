@@ -16,6 +16,12 @@ case class PatientView(personalData: PersonalData,
                        job: Option[String])
 
 object PatientView {
+  import PersonalData._
+  import PostalAddress._
+  import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._
+  import PhoneNumber._
+  import EmailAddress._
+  import PatientStatus._
   implicit val format: OFormat[PatientView] = Json.format
 
 }
