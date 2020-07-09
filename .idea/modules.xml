@@ -12,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/lagom-internal-meta-project-kafka.iml" filepath="$PROJECT_DIR$/.idea/modules/lagom-internal-meta-project-kafka.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/lagom-internal-meta-project-service-locator.iml" filepath="$PROJECT_DIR$/.idea/modules/lagom-internal-meta-project-service-locator.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/patient-management-api.iml" filepath="$PROJECT_DIR$/.idea/modules/patient-management-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/patient-management-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/patient-management-impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/security-api.iml" filepath="$PROJECT_DIR$/.idea/modules/security-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/security-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/security-impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/util.iml" filepath="$PROJECT_DIR$/.idea/modules/util.iml" />

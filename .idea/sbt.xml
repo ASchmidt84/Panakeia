@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/binary-management-api" />
             <option value="$PROJECT_DIR$/binary-management-impl" />
             <option value="$PROJECT_DIR$/patient-management-api" />
+            <option value="$PROJECT_DIR$/patient-management-impl" />
             <option value="$PROJECT_DIR$/project" />
             <option value="$PROJECT_DIR$/security-api" />
             <option value="$PROJECT_DIR$/security-impl" />
