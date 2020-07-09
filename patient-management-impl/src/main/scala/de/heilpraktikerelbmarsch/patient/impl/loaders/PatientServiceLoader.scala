@@ -15,6 +15,7 @@ import play.api.Environment
 import play.api.db.HikariCPComponents
 import play.api.libs.ws.ahc.AhcWSComponents
 import com.softwaremill.macwire.wire
+import de.heilpraktikerelbmarsch.patient.impl.patient.{Patient, SerializerRegistry}
 import de.heilpraktikerelbmarsch.patient.impl.services.PatientServiceImpl
 
 import scala.concurrent.ExecutionContext
@@ -59,11 +60,11 @@ trait PatientServiceComponents extends LagomServerComponents
   private implicit val mode = environment.mode
 
   //Event Processors
-  lazy val processor: BenefitRateProcessor = wire[BenefitRateProcessor]
+  lazy val processor: PatientProcessor = wire[PatientProcessor]
   readSide.register(processor)
 
   //Repos
-  lazy val globalRepository = wire[BenefitRateRepository]
+  lazy val globalRepository = wire[PatientRepository]
 
 
 
@@ -71,8 +72,8 @@ trait PatientServiceComponents extends LagomServerComponents
   // Initialize the sharding for the ShoppingCart aggregate.
   // See https://doc.akka.io/docs/akka/2.6/typed/cluster-sharding.html
   clusterSharding.init(
-    Entity(BenefitRate.typedKey) { entityContext =>
-      BenefitRate(entityContext)
+    Entity(Patient.typedKey) { entityContext =>
+      Patient(entityContext)
     }
   )
 
