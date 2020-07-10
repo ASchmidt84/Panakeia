@@ -15,7 +15,7 @@ import play.api.Environment
 import play.api.db.HikariCPComponents
 import play.api.libs.ws.ahc.AhcWSComponents
 import com.softwaremill.macwire.wire
-import de.heilpraktikerelbmarsch.patient.impl.patient.{Patient, SerializerRegistry}
+import de.heilpraktikerelbmarsch.patient.impl.patient.{Patient, PatientProcessor, PatientRepository, SerializerRegistry}
 import de.heilpraktikerelbmarsch.patient.impl.services.PatientServiceImpl
 
 import scala.concurrent.ExecutionContext

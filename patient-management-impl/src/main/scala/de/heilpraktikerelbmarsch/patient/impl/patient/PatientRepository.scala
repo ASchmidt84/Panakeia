@@ -1,5 +1,4 @@
-package de.heilpraktikerelbmarsch.patient.impl.loaders
-
+package de.heilpraktikerelbmarsch.patient.impl.patient
 
 import java.util.UUID
 

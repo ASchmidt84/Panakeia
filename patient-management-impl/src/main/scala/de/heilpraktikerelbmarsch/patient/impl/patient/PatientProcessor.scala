@@ -1,12 +1,11 @@
-package de.heilpraktikerelbmarsch.patient.impl.loaders
+package de.heilpraktikerelbmarsch.patient.impl.patient
 
 import java.util.UUID
 
 import akka.Done
-import com.lightbend.lagom.scaladsl.persistence.{AggregateEventTag, EventStreamElement, ReadSideProcessor}
 import com.lightbend.lagom.scaladsl.persistence.slick.SlickReadSide
+import com.lightbend.lagom.scaladsl.persistence.{AggregateEventTag, EventStreamElement, ReadSideProcessor}
 import de.heilpraktikerelbmarsch.patient.api.adt.PatientStatus
-import de.heilpraktikerelbmarsch.patient.impl.patient.Patient
 import de.heilpraktikerelbmarsch.util.adt.contacts.EmailAddress
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcType
