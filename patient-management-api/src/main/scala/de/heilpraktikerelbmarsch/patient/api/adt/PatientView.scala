@@ -13,9 +13,11 @@ case class PatientView(personalData: PersonalData,
                        phoneWork: Option[PhoneNumber],
                        cellPhone: Option[PhoneNumber],
                        fax: Option[PhoneNumber],
-                       job: Option[String])
+                       job: Option[String],
+                       personalPicture: Option[PatientPicture])
 
 object PatientView {
+  import PatientPicture._
   import PersonalData._
   import PostalAddress._
   import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._

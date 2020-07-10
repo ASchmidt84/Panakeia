@@ -1,12 +1,14 @@
 package de.heilpraktikerelbmarsch.patient.impl.patient
 
+import java.util.UUID
+
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.cluster.sharding.typed.scaladsl.{EntityContext, EntityTypeKey}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior, ReplyEffect, RetentionCriteria}
 import com.lightbend.lagom.scaladsl.persistence.{AggregateEvent, AggregateEventShards, AggregateEventTag, AggregateEventTagger, AkkaTaggerAdapter}
 import com.lightbend.lagom.scaladsl.playjson.{JsonSerializer, JsonSerializerRegistry}
-import de.heilpraktikerelbmarsch.patient.api.adt.PatientStatus
+import de.heilpraktikerelbmarsch.patient.api.adt.{PatientPicture, PatientStatus}
 import de.heilpraktikerelbmarsch.util.adt.contacts.{EmailAddress, Operator, PersonalData, PhoneNumber, PostalAddress}
 import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json.{Json, OFormat}
@@ -21,6 +23,7 @@ object Patient {
   import PhoneNumber._
   import EmailAddress._
   import PatientStatus._
+  import PatientPicture._
 
 
   // Commands ------------------------------------------------------------------------------------------------------>
@@ -84,6 +87,14 @@ object Patient {
                           operator: Operator,
                           replyTo: ActorRef[Confirmation]) extends Command
 
+  final case class SetPicture(picId: UUID,
+                              pictureName: String,
+                              operator: Operator,
+                              replyTo: ActorRef[Confirmation]) extends Command
+
+  final case class ClearPicture(operator: Operator,
+                                replyTo: ActorRef[Confirmation]) extends Command
+
 
   // Commands <------------------------------------------------------------------------------------------------------
   // Replies ------------------------------------------------------------------------------------------------------->
@@ -98,7 +109,8 @@ object Patient {
                            phoneWork: Option[PhoneNumber],
                            cellPhone: Option[PhoneNumber],
                            fax: Option[PhoneNumber],
-                           job: Option[String])
+                           job: Option[String],
+                           personalPicture: Option[PatientPicture])
 
   sealed trait Confirmation
   final case class CommandAccepted(summary: Summary) extends Confirmation
@@ -179,6 +191,10 @@ object Patient {
                            operator: Operator,
                            timestamp: DateTime = DateTime.now()) extends Event
 
+  final case class PictureSet(picture: Option[PatientPicture],
+                              operator: Operator,
+                              timestamp: DateTime = DateTime.now()) extends Event
+
   implicit val jsonFormatCreated: OFormat[Created] = Json.format
   implicit val jsonFormatStatusChanged: OFormat[StatusChanged] = Json.format
   implicit val jsonFormatPersonalDataChanged: OFormat[PersonalDataChanged] = Json.format
@@ -187,6 +203,7 @@ object Patient {
   implicit val jsonFormatEmailChanged: OFormat[EmailChanged] = Json.format
   implicit val jsonFormatJobChanged: OFormat[JobChanged] = Json.format
   implicit val jsonFormatDeleted: OFormat[Deleted] = Json.format
+  implicit val jsonFormatPictureSet: OFormat[PictureSet] = Json.format
 
   // Events <--------------------------------------------------------------------------------------------------------
 
@@ -211,7 +228,8 @@ object Patient {
     JsonSerializer(jsonFormatPhoneDataChanged),
     JsonSerializer(jsonFormatEmailChanged),
     JsonSerializer(jsonFormatJobChanged),
-    JsonSerializer(jsonFormatDeleted)
+    JsonSerializer(jsonFormatDeleted),
+    JsonSerializer(jsonFormatPictureSet)
   )
 
   def apply(persistenceId: PersistenceId): EventSourcedBehavior[Command, Event, Patient] = {
@@ -243,7 +261,8 @@ final case class Patient(number: String,
                          cellPhone: Option[PhoneNumber] = None,
                          fax: Option[PhoneNumber] = None,
                          job: Option[String] = None,
-                         deleted: Boolean = false) {
+                         deleted: Boolean = false,
+                         picture: Option[PatientPicture] = None) {
   import Patient._
 
   private def isInit = (number == empty.number || personalData == empty.personalData) && !deleted
@@ -251,7 +270,7 @@ final case class Patient(number: String,
   implicit def toSummary(x: Patient): Summary = Summary(
     x.number,x.status,x.personalData,x.postalAddress,
     x.birthdate,x.email,x.phonePrivate,x.phoneWork,
-    x.cellPhone,x.fax,x.job
+    x.cellPhone,x.fax,x.job,x.picture
   )
 
   def applyCommand(cmd: Command): ReplyEffect[Event, Patient] = cmd match {
@@ -272,10 +291,22 @@ final case class Patient(number: String,
         onChangePostalAddress(address,op,replyTo)
       case Delete(reason,op,replyTo) =>
         onDelete(reason,op,replyTo)
+      case SetPicture(id,name,op,replyTo) =>
+        onSetPicture(Some(PatientPicture(id,name)),op,replyTo)
+      case ClearPicture(op,reply) =>
+        onSetPicture(None,op,reply)
       case t: Command =>
         Effect.reply(t.replyTo)(CommandRejected(s"Current status is $status, command rejected"))
     }
     case x: Command => Effect.reply(x.replyTo)(CommandRejected("Unknown command"))
+  }
+
+  private def onSetPicture(pic: Option[PatientPicture],
+                           operator: Operator,
+                           replyTo: ActorRef[Confirmation] ): ReplyEffect[Event,Patient] = {
+    Effect
+      .persist(PictureSet(pic,operator))
+      .thenReply(replyTo)(e => CommandAccepted(toSummary(e)))
   }
 
   private def onDelete(reason: String,
@@ -366,6 +397,7 @@ final case class Patient(number: String,
     case EmailChanged(e,_,_) => copy(email = e)
     case x: PhoneDataChanged => onPhoneChanged(x)
     case _: Deleted => onDeleted()
+    case PictureSet(pic,_,_) => copy(picture = pic)
     case _ => this
   }
 

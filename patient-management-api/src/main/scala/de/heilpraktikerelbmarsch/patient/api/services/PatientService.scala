@@ -4,8 +4,8 @@ import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.deser.PathParamSerializer
 import com.lightbend.lagom.scaladsl.api.transport.{Method, NotFound}
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceAcl, ServiceCall}
-import de.heilpraktikerelbmarsch.patient.api.adt.{PatientStatus, PatientView}
-import de.heilpraktikerelbmarsch.patient.api.request.{PatientPhoneForm, PatientSearchForm}
+import de.heilpraktikerelbmarsch.patient.api.adt.{PatientPicture, PatientStatus, PatientView}
+import de.heilpraktikerelbmarsch.patient.api.request.{CreatePatientForm, PatientPhoneForm, PatientSearchForm}
 import de.heilpraktikerelbmarsch.util.adt.contacts.{EmailAddress, PersonalData, PostalAddress}
 import de.heilpraktikerelbmarsch.util.adt.security.MicroServiceIdentifier.PatientServiceIdentifier
 
@@ -19,7 +19,7 @@ trait PatientService extends Service {
    * Creates a new patient
    * @return a [[de.heilpraktikerelbmarsch.patient.api.adt.PatientView]]
    */
-  def createPatient(): ServiceCall[NotUsed,PatientView]
+  def createPatient(): ServiceCall[CreatePatientForm,PatientView]
 
   /**
    * Get a patient by his patient number which is unique!
@@ -110,13 +110,27 @@ trait PatientService extends Service {
    */
   def clearPatientEmailAddress(number: String): ServiceCall[NotUsed,PatientView]
 
+  /**
+   * Adds a picture to patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def setPatientPicture(number: String): ServiceCall[PatientPicture,PatientView]
+
+  /**
+   * Removes the picture of a patient
+   * @param number required number to change the patient data
+   * @return
+   */
+  def clearPatientPicture(number: String): ServiceCall[NotUsed,PatientView]
+
 
   implicit val pathParamSerializerPatientStatus: PathParamSerializer[PatientStatus] = new PathParamSerializer[PatientStatus] {
     override def serialize(parameter: PatientStatus): Seq[String] = immutable.Seq(parameter.name)
 
     override def deserialize(parameters: Seq[String]): PatientStatus = parameters.headOption match {
       case Some(i) => PatientStatus.withName(i)
-      case _ => throw new IllegalArgumentException("Patientstatus needs an parameter as string")
+      case _ => throw new IllegalArgumentException("Patientstatus needs a parameter as string")
     }
   }
 
@@ -138,6 +152,8 @@ trait PatientService extends Service {
         restCall(Method.PUT,path(":number/job"), changePatientJob _),
         restCall(Method.DELETE,path(":number/job"), clearPatientJob _),
         restCall(Method.PUT,path(":number/phone-data"), changePatientPhoneData _),
+        restCall(Method.PUT,path(":number/picture"), setPatientPicture _),
+        restCall(Method.DELETE,path(":number/picture"), clearPatientPicture _),
         restCall(Method.POST,path(""), createPatient _)
       )
       .withAutoAcl(true)

@@ -1,6 +1,7 @@
 package de.heilpraktikerelbmarsch.patient.api.request
 
 import de.heilpraktikerelbmarsch.util.adt.contacts.PhoneNumber
+import org.joda.time.LocalDate
 import play.api.libs.json.{Json, OFormat}
 
 case class PatientSearchForm(name: Option[String],
@@ -8,9 +9,10 @@ case class PatientSearchForm(name: Option[String],
                              street: Option[String],
                              zip: Option[String],
                              place: Option[String],
-                             birthday: Option[String])
+                             birthday: Option[LocalDate])
 
 object PatientSearchForm {
+  import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._
   implicit val format: OFormat[PatientSearchForm] = Json.format
 }
 
