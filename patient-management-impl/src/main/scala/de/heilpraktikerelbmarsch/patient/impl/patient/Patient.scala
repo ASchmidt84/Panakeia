@@ -80,6 +80,10 @@ object Patient {
                              operator: Operator,
                              replyTo: ActorRef[Confirmation]) extends Command
 
+  final case class Delete(reason: String,
+                          operator: Operator,
+                          replyTo: ActorRef[Confirmation]) extends Command
+
 
   // Commands <------------------------------------------------------------------------------------------------------
   // Replies ------------------------------------------------------------------------------------------------------->
@@ -171,6 +175,10 @@ object Patient {
                               operator: Operator,
                               timestamp: DateTime = DateTime.now()) extends Event
 
+  final case class Deleted(reason: String,
+                           operator: Operator,
+                           timestamp: DateTime = DateTime.now()) extends Event
+
   implicit val jsonFormatCreated: OFormat[Created] = Json.format
   implicit val jsonFormatStatusChanged: OFormat[StatusChanged] = Json.format
   implicit val jsonFormatPersonalDataChanged: OFormat[PersonalDataChanged] = Json.format
@@ -178,6 +186,7 @@ object Patient {
   implicit val jsonFormatPhoneDataChanged: OFormat[PhoneDataChanged] = Json.format
   implicit val jsonFormatEmailChanged: OFormat[EmailChanged] = Json.format
   implicit val jsonFormatJobChanged: OFormat[JobChanged] = Json.format
+  implicit val jsonFormatDeleted: OFormat[Deleted] = Json.format
 
   // Events <--------------------------------------------------------------------------------------------------------
 
@@ -202,6 +211,7 @@ object Patient {
     JsonSerializer(jsonFormatPhoneDataChanged),
     JsonSerializer(jsonFormatEmailChanged),
     JsonSerializer(jsonFormatJobChanged),
+    JsonSerializer(jsonFormatDeleted)
   )
 
   def apply(persistenceId: PersistenceId): EventSourcedBehavior[Command, Event, Patient] = {
@@ -232,10 +242,11 @@ final case class Patient(number: String,
                          phoneWork: Option[PhoneNumber] = None,
                          cellPhone: Option[PhoneNumber] = None,
                          fax: Option[PhoneNumber] = None,
-                         job: Option[String] = None) {
+                         job: Option[String] = None,
+                         deleted: Boolean = false) {
   import Patient._
 
-  private def isInit = number == empty.number || personalData == empty.personalData
+  private def isInit = (number == empty.number || personalData == empty.personalData) && !deleted
 
   implicit def toSummary(x: Patient): Summary = Summary(
     x.number,x.status,x.personalData,x.postalAddress,
@@ -245,7 +256,95 @@ final case class Patient(number: String,
 
   def applyCommand(cmd: Command): ReplyEffect[Event, Patient] = cmd match {
     case c: Create if isInit => onCreate(c)
+    case Get(r) if !deleted => Effect.reply(r)( CommandAccepted(toSummary(this)) )
+    case ChangeStatus(status,op,reply) if !isInit && !deleted => onChangeStatus(status,op,reply)
+      //Aktiv
+    case x if !isInit && status == PatientStatus.Active && !deleted => x match {
+      case ChangePersonalData(data,op,reply) =>
+        onChangePersonalData(data,op,reply)
+      case ChangeEmail(email,op,replyTo) =>
+        onChangeEmail(email,op,replyTo)
+      case ChangePhoneData(privPhone,workPhone,cellPhone,fax,op,replyTo) =>
+        onChangePhoneData(privPhone,workPhone,cellPhone,fax,op,replyTo)
+      case ChangeJob(job,op,replyTo) =>
+        onChangeJob(job,op,replyTo)
+      case ChangePostalAddress(address,op,replyTo) =>
+        onChangePostalAddress(address,op,replyTo)
+      case Delete(reason,op,replyTo) =>
+        onDelete(reason,op,replyTo)
+      case t: Command =>
+        Effect.reply(t.replyTo)(CommandRejected(s"Current status is $status, command rejected"))
+    }
     case x: Command => Effect.reply(x.replyTo)(CommandRejected("Unknown command"))
+  }
+
+  private def onDelete(reason: String,
+                       operator: Operator,
+                       replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    Effect
+      .persist(Deleted(reason,operator))
+      .thenReply(replyTo)(r => CommandAccepted(toSummary(r)))
+  }
+
+  private def onChangePostalAddress(address: PostalAddress,
+                                    operator: Operator,
+                                    replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    if( postalAddress.isDefined && postalAddress.get == address )
+      Effect.reply(replyTo)(CommandRejected("Address already the same"))
+    else
+      Effect
+          .persist(PostalAddressChanged(address,operator))
+          .thenReply(replyTo)(d => CommandAccepted(toSummary(d)))
+  }
+
+  private def onChangeJob(job: Option[String],
+                          operator: Operator,
+                          replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    if( this.job.getOrElse("~").equalsIgnoreCase(job.getOrElse("~")) )
+      Effect.reply(replyTo)(CommandRejected("Job already the same"))
+    else
+      Effect
+          .persist(JobChanged(job,operator))
+          .thenReply(replyTo)(r => CommandAccepted(toSummary(r)))
+  }
+
+  private def onChangePhoneData(privatePhone: Option[PhoneNumber],
+                                workPhone: Option[PhoneNumber],
+                                cellPhone: Option[PhoneNumber],
+                                fax: Option[PhoneNumber],
+                                operator: Operator,
+                                replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    Effect
+      .persist(PhoneDataChanged(privatePhone,workPhone,cellPhone,fax,operator))
+      .thenReply(replyTo)(u => CommandAccepted(toSummary(u)) )
+  }
+
+  private def onChangeEmail(email: Option[EmailAddress],
+                            operator: Operator,
+                            replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    if( email.map(_.value).getOrElse("~").equalsIgnoreCase(this.email.map(_.value).getOrElse("~")) ){
+      Effect.reply(replyTo)(CommandRejected("Email is equal, cannot change"))
+    } else
+      Effect
+        .persist(EmailChanged(email,operator))
+        .thenReply(replyTo)(u => CommandAccepted(toSummary(u)))
+  }
+
+  private def onChangePersonalData(data: PersonalData,
+                                   operator: Operator,
+                                   replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    Effect
+        .persist(PersonalDataChanged(data,operator))
+        .thenReply(replyTo)(e => CommandAccepted(toSummary(e)))
+  }
+
+  private def onChangeStatus(status: PatientStatus, operator: Operator, replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
+    if(this.status == status) {
+      Effect.reply(replyTo)( CommandRejected("Cannot change, status already set") )
+    } else
+      Effect
+        .persist( StatusChanged(status,operator) )
+        .thenReply(replyTo)(r => CommandAccepted(toSummary(r)) )
   }
 
   private def onCreate(cmd: Create): ReplyEffect[Event, Patient] = {
@@ -260,9 +359,31 @@ final case class Patient(number: String,
 
   def applyEvent(evt: Event): Patient = evt match {
     case x: Created => onCreated(x)
+    case StatusChanged(s,_,_) => copy(status = s)
+    case JobChanged(j,_,_) => copy(job = j)
+    case PersonalDataChanged(data,_,_) => copy(personalData = data)
+    case PostalAddressChanged(data,_,_) => copy(postalAddress = Some(data))
+    case EmailChanged(e,_,_) => copy(email = e)
+    case x: PhoneDataChanged => onPhoneChanged(x)
+    case _: Deleted => onDeleted()
     case _ => this
   }
 
+  private def onPhoneChanged(x: PhoneDataChanged): Patient = {
+    copy(
+      phoneWork = x.phoneWork,
+      phonePrivate = x.phonePrivate,
+      cellPhone = x.cellPhone,
+      fax = x.fax
+    )
+  }
+
+  private def onDeleted(): Patient = copy(
+    number = "****", status = PatientStatus.InActive,
+    PersonalData("****","****","****"),
+    None,None,None,None,None,None,None,None,
+    true
+  )
 
   private def onCreated(x: Created): Patient = copy(
     number = x.number,

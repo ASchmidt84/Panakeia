@@ -28,6 +28,7 @@ class PatientProcessor(readSide: SlickReadSide)(implicit ec: ExecutionContext) e
     .setEventHandler[PersonalDataChanged](updatePersonalData)
     .setEventHandler[EmailChanged](updateEmail)
     .setEventHandler[PostalAddressChanged](updatePostalAddress)
+    .setEventHandler[Deleted](deletePatient)
     .build()
 
   override def aggregateTags: Set[AggregateEventTag[Patient.Event]] = Patient.Event.Tag.allTags
@@ -35,6 +36,10 @@ class PatientProcessor(readSide: SlickReadSide)(implicit ec: ExecutionContext) e
   //-------- Methods ----------------------
 
   private def singleFilterQuery(id: String) = table.filter(_.entityId === UUID.fromString(id))
+
+  private def deletePatient(e: EventStreamElement[Deleted]): DBIO[Done] = {
+    singleFilterQuery(e.entityId).delete
+  }.map(_ => Done)
 
   private def updatePostalAddress(e: EventStreamElement[PostalAddressChanged]): DBIO[Done] = {
     singleFilterQuery(e.entityId)
