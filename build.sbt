@@ -56,7 +56,8 @@ lazy val `panakeia` = (project in file("."))
   .aggregate(
     `security-api`, `security-impl`,
     `binary-management-api`,`binary-management-impl`,
-    `benefitRate-management-api`, `benefitRate-management-impl`
+    `benefitRate-management-api`, `benefitRate-management-impl`,
+    `patient-management-api`,`patient-management-impl`
   )
 
 
