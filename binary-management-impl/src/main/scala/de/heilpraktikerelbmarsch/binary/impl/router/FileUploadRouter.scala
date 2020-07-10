@@ -11,6 +11,7 @@ import de.heilpraktikerelbmarsch.binary.impl.storage.Storage
 import play.api.data.Form
 import play.api.data.Form._
 import play.api.data.Forms._
+import play.api.libs.json.Json
 import play.api.libs.streams.Accumulator
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc.{DefaultActionBuilder, PlayBodyParsers, Results}
@@ -51,6 +52,9 @@ class FileUploadRouter(action: DefaultActionBuilder,
     "description" -> optional(text)
   )(PatientDataUploadForm.apply)(PatientDataUploadForm.unapply))
 
+  /**
+   * Rückgabe für den upload ist datei name und id zum finden des bildes!
+   */
   val router = Router.from {
     case POST(/*p"/patient/file"*/route) if route.path.contains("/patient/file") =>
       action.async( parser.multipartFormData(fileHandler) ) { request =>
@@ -59,8 +63,8 @@ class FileUploadRouter(action: DefaultActionBuilder,
           hasErrors => Future.successful(Results.BadRequest(s"Error in upload!\n${hasErrors.errors.mkString("\n")}")),
           ok => {
             Future.sequence(request.body.files.map{u =>
-              binaryRepository.addPatientFile(ok.patientNumber,ok.caseNumber,u.ref,ok.description)
-            }).map{_ => Results.Ok("Transfer complete") }
+              binaryRepository.addPatientFile(ok.patientNumber,ok.caseNumber,u.ref,ok.description).map(r => r -> u.filename)
+            }).map{a => Results.Ok( Json.toJson(a.map(r => Json.toJson( Map("fileName" -> Json.toJson(r._2), "id" -> Json.toJson(r._1) ) ) ) ) ) }
           }
         )
       }
