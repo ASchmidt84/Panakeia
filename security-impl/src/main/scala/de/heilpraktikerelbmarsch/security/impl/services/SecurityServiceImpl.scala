@@ -43,10 +43,11 @@ class SecurityServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
   implicit val timeout = Timeout(15.seconds)
 
   private def generateJwt(profile: ProfileSummary, entityId: UUID): String = {
+    import scala.jdk.CollectionConverters._
     val jwt = new JWTClaimsSet.Builder()
       .issuer("Panakeia")
       .subject(profile.login)
-      .claim("roles", ImmutableList.of(profile.roles.map(_.name)) ) //Erstmal musst du die Rolle haben dann das Recht! Das Recht wird vom µ-Service SELBER verwaltet!!!
+      .claim("roles", ImmutableList.copyOf( profile.roles.map(_.name).asJava ) ) //Erstmal musst du die Rolle haben dann das Recht! Das Recht wird vom µ-Service SELBER verwaltet!!!
       .claim("userId",profile.login)
       .claim(Pac4jConstants.USERNAME,profile.login)
 //      .claim(Pac4jConstants.PASSWORD,profile)
