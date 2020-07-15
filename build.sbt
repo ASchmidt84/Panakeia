@@ -157,6 +157,35 @@ lazy val `patient-management-impl` = (project in file("patient-management-impl")
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`patient-management-api`,`security-api`)
 
+//Patienten Akte
+lazy val `file-management-api` = (project in file("file-management-api"))
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslApi,
+      lagomScaladslServer,
+      playJsonDerivedCodecs
+    )// ++ elastic4sDep //Sehe ich noch nicht also wirklich nötig
+  )
+  .dependsOn(`util`)
+
+lazy val `file-management-impl` = (project in file("file-management-impl"))
+  .enablePlugins(LagomScala,LauncherJarPlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslPersistenceJdbc,
+      lagomScaladslTestKit,
+      lagomScaladslKafkaBroker,
+      macwire,
+      scalaTest,
+      playJsonDerivedCodecs,
+      lagomScaladslAkkaDiscovery,
+      postgresDriver
+    )
+  )
+  .settings(dockerSettings: _*)
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`file-management-api`,`security-api`,`binary-management-api`)
+
 
 lazy val `benefitRate-management-api` = (project in file("benefitRate-management-api"))
   .settings(

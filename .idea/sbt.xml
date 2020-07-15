@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$/benefitRate-management-impl" />
             <option value="$PROJECT_DIR$/binary-management-api" />
             <option value="$PROJECT_DIR$/binary-management-impl" />
+            <option value="$PROJECT_DIR$/file-management-api" />
+            <option value="$PROJECT_DIR$/file-management-impl" />
             <option value="$PROJECT_DIR$/patient-management-api" />
             <option value="$PROJECT_DIR$/patient-management-impl" />
             <option value="$PROJECT_DIR$/project" />

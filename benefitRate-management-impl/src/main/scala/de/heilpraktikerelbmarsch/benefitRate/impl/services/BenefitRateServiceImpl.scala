@@ -25,6 +25,17 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
+/**
+ * BenefiteRate Service is an service to provide all payable handlings/actions for the therapist to the patient.
+ * This means if the therapist executes like give an injection, the rate which the patient has to pay,
+ * has to lay here. And will be stored in his file.
+ * @param persistentEntityRegistry
+ * @param securityConfig
+ * @param clusterSharding
+ * @param repository
+ * @param ec
+ * @param config
+ */
 class BenefitRateServiceImpl(persistentEntityRegistry: PersistentEntityRegistry,
                              override val securityConfig: org.pac4j.core.config.Config,
                              clusterSharding: ClusterSharding,
