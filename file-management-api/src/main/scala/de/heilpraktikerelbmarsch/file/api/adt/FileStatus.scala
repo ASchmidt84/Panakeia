@@ -20,9 +20,13 @@ object FileStatus extends Enum[FileStatus] {
 
 }
 
-
 sealed abstract class EntryTyp private[adt](val name: String) extends EnumEntry {
   override def toString: String = name.trim.toLowerCase
+}
+
+
+object EntryTyp extends Enum[EntryTyp] {
+  override def values: IndexedSeq[EntryTyp] = findValues
 
   case object Anamnesis extends EntryTyp("anamnesis")
   case object Diagnose extends EntryTyp("diagnose")

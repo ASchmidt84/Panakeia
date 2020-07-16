@@ -5,9 +5,8 @@ import akka.cluster.sharding.typed.scaladsl.{EntityContext, EntityTypeKey}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior, ReplyEffect, RetentionCriteria}
 import com.lightbend.lagom.scaladsl.persistence.{AggregateEvent, AggregateEventShards, AggregateEventTag, AggregateEventTagger, AkkaTaggerAdapter}
-import com.lightbend.lagom.scaladsl.playjson.JsonSerializer
-import de.heilpraktikerelbmarsch.file.api.adt.{FileStatus, PatientView}
-import de.heilpraktikerelbmarsch.file.impl.file.adt.Entry
+import com.lightbend.lagom.scaladsl.playjson.{JsonSerializer, JsonSerializerRegistry}
+import de.heilpraktikerelbmarsch.file.api.adt.{Entry, FileStatus, PatientView}
 import de.heilpraktikerelbmarsch.util.adt.contacts.Operator
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
@@ -189,4 +188,9 @@ final case class PatientFile(patient: Option[PatientView],
       copy( entries = (entry :: this.entries.toList).sortBy(_.timestamp.getMillis) )
   }
 
+}
+
+
+object SerializerRegistry extends JsonSerializerRegistry {
+  override def serializers: Seq[JsonSerializer[_]] = PatientFile.serializer
 }

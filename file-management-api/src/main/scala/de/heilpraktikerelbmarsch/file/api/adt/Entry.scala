@@ -1,6 +1,5 @@
-package de.heilpraktikerelbmarsch.file.impl.file.adt
+package de.heilpraktikerelbmarsch.file.api.adt
 
-import de.heilpraktikerelbmarsch.file.api.adt.EntryTyp
 import de.heilpraktikerelbmarsch.util.adt.contacts.Operator
 import julienrf.json.derived
 import org.joda.time.DateTime
@@ -51,7 +50,6 @@ final case class LaborReportEntry(timestamp: DateTime,
                                   benefitRateNumber: Option[String]) extends Entry
 
 object LaborReportEntry {
-  import LaborValue._
   implicit val format: OFormat[LaborReportEntry] = derived.oformat()
 }
 

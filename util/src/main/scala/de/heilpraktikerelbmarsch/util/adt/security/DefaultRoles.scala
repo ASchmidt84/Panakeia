@@ -39,6 +39,7 @@ object MicroServiceIdentifier extends Enum[MicroServiceIdentifier] {
   case object BinaryServiceIdentifier extends MicroServiceIdentifier("binary-service","service/binary")
   case object PatientServiceIdentifier extends MicroServiceIdentifier("patient-service","service/patient")
   case object BenefitRateServiceIdentifier extends MicroServiceIdentifier("benefiterate-service","service/benefit-rate")
+  case object PatientFileServiceIdentifier extends MicroServiceIdentifier("file-management-impl","service/patient-file")
 
   implicit val format: OFormat[MicroServiceIdentifier] = derived.oformat[MicroServiceIdentifier]()
 }
