@@ -3,7 +3,7 @@ package de.heilpraktikerelbmarsch.file.impl.file
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.cluster.sharding.typed.scaladsl.{EntityContext, EntityTypeKey}
 import akka.persistence.typed.PersistenceId
-import akka.persistence.typed.scaladsl.{EventSourcedBehavior, ReplyEffect, RetentionCriteria}
+import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior, ReplyEffect, RetentionCriteria}
 import com.lightbend.lagom.scaladsl.persistence.{AggregateEvent, AggregateEventShards, AggregateEventTag, AggregateEventTagger, AkkaTaggerAdapter}
 import com.lightbend.lagom.scaladsl.playjson.JsonSerializer
 import de.heilpraktikerelbmarsch.file.api.adt.{FileStatus, PatientView}
@@ -18,6 +18,7 @@ object PatientFile {
   import julienrf.json.derived
   import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._
   import PatientView._
+  import FileStatus._
 
 
   // Commands ------------------------------------------------------------------------------------------------------>
@@ -34,11 +35,32 @@ object PatientFile {
     val replyTo: ActorRef[Confirmation]
   }
 
+  final case class Get(replyTo: ActorRef[Confirmation]) extends Command
+
+  final case class Create(patientView: PatientView,
+                          operator: Operator,
+                          replyTo: ActorRef[Confirmation]) extends Command
+
+  final case class Close(operator: Operator,
+                         reason: String,
+                         replyTo: ActorRef[Confirmation]) extends Command
+
+  final case class Reopen(operator: Operator,
+                          reason: String,
+                          replyTo: ActorRef[Confirmation]) extends Command
+
+  final case class AddEntry(entry: Entry,
+                            operator: Operator,
+                            replyTo: ActorRef[Confirmation]) extends Command
+
 
   // Commands <------------------------------------------------------------------------------------------------------
   // Replies ------------------------------------------------------------------------------------------------------->
 
-  final case class Summary()
+  final case class Summary(patient: PatientView,
+                           createDate: DateTime,
+                           entries: Seq[Entry],
+                           status: FileStatus)
 
   sealed trait Confirmation
   final case class CommandAccepted(summary: Summary) extends Confirmation
@@ -63,6 +85,27 @@ object PatientFile {
     val Tag: AggregateEventShards[Event] = AggregateEventTag.sharded[Event](2)
   }
 
+  final case class Created(patientView: PatientView,
+                           operator: Operator,
+                           timestamp: DateTime = DateTime.now()) extends Event
+
+  final case class Closed(reason: String,
+                          operator: Operator,
+                          timestamp: DateTime = DateTime.now()) extends Event
+
+  final case class Reopened(reason: String,
+                            operator: Operator,
+                            timestamp: DateTime = DateTime.now()) extends Event
+
+  final case class EntryAdded(entry: Entry,
+                              operator: Operator,
+                              timestamp: DateTime = DateTime.now()) extends Event
+
+  implicit val createdJsonFormat: OFormat[Created] = Json.format
+  implicit val closedJsonFormat: OFormat[Closed] = Json.format
+  implicit val reopenedJsonFormat: OFormat[Reopen] = Json.format
+  implicit val entryAddedJsonFormat: OFormat[EntryAdded] = Json.format
+
   // Events <--------------------------------------------------------------------------------------------------------
 
   val empty: PatientFile = PatientFile(
@@ -76,7 +119,11 @@ object PatientFile {
     JsonSerializer(summaryJson),
     JsonSerializer(cmdAcceptedJson),
     JsonSerializer(cmdRejectedJson),
-    JsonSerializer(confirmationJson)
+    JsonSerializer(confirmationJson),
+    JsonSerializer(createdJsonFormat),
+    JsonSerializer(closedJsonFormat),
+    JsonSerializer(reopenedJsonFormat),
+    JsonSerializer(entryAddedJsonFormat)
   )
 
   def apply(persistenceId: PersistenceId): EventSourcedBehavior[Command, Event, PatientFile] = {
@@ -104,9 +151,42 @@ final case class PatientFile(patient: Option[PatientView],
                              entries: Seq[Entry]) {
   import PatientFile._
 
+  implicit private def toSummary(x: PatientFile): Summary = Summary(
+    x.patient.get, x.createDate, x.entries, x.status
+  )
 
-  def applyCommand(cmd: Command): ReplyEffect[Event, PatientFile] = ???
 
-  def applyEvent(evt: Event): PatientFile = ???
+  def applyCommand(cmd: Command): ReplyEffect[Event, PatientFile] = cmd match {
+    case Get(reply) if status != FileStatus.Init =>
+      Effect.reply(reply)(CommandAccepted(this))
+    case s if status == FileStatus.Closed => s match {
+      case Reopen(op,reason,reply) =>
+        Effect.persist( Reopened(reason,op) ).thenReply(reply)(r => CommandAccepted(r))
+      case f: Command => Effect.reply(f.replyTo)(CommandRejected("file closed, please reopen first"))
+    }
+    case s if status == FileStatus.Init => s match {
+      case Create(p,op,reply) =>
+        Effect.persist( Created(p,op) ).thenReply(reply)(r => CommandAccepted(r))
+      case f: Command => Effect.reply(f.replyTo)(CommandRejected("file is not initialized, please initialize first"))
+    }
+    case AddEntry(entry,_,reply) if entries.exists(_.timestamp.isAfter(entry.timestamp) ) =>
+      Effect.reply(reply)(CommandRejected("impossible to add an entry in the past"))
+    case AddEntry(entry,op,reply) =>
+      Effect.persist( EntryAdded(entry,op) ).thenReply(reply)(r => CommandAccepted(r))
+    case Close(op,reason,reply) =>
+      Effect.persist(Closed(reason,op)).thenReply(reply)(r => CommandAccepted(r) )
+    case f: Command => Effect.reply(f.replyTo)(CommandRejected("this command is invalid"))
+  }
+
+  def applyEvent(evt: Event): PatientFile = evt match {
+    case Created(view,_,time) =>
+      copy(patient = Some(view), createDate = time, status = FileStatus.Active)
+    case Closed(_,_,_) =>
+      copy(status = FileStatus.Closed)
+    case Reopened(_,_,_) =>
+      copy(status = FileStatus.Active)
+    case EntryAdded(entry,_,_) =>
+      copy( entries = (entry :: this.entries.toList).sortBy(_.timestamp.getMillis) )
+  }
 
 }
