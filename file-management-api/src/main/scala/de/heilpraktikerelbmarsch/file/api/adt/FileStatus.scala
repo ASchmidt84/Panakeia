@@ -13,7 +13,7 @@ object FileStatus extends Enum[FileStatus] {
   override def values: IndexedSeq[FileStatus] = findValues
 
   case object Init extends FileStatus("init")
-  case object Active extends FileStatus("active")
+  case object Open extends FileStatus("open")
   case object Closed extends FileStatus("closed")
 
   implicit val format: OFormat[FileStatus] = derived.oformat()
