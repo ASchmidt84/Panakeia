@@ -180,11 +180,11 @@ final case class PatientFile(patient: Option[PatientView],
 
   def applyEvent(evt: Event): PatientFile = evt match {
     case Created(view,_,time) =>
-      copy(patient = Some(view), createDate = time, status = FileStatus.Active)
+      copy(patient = Some(view), createDate = time, status = FileStatus.Open)
     case Closed(_,_,_) =>
       copy(status = FileStatus.Closed)
     case Reopened(_,_,_) =>
-      copy(status = FileStatus.Active)
+      copy(status = FileStatus.Open)
     case EntryAdded(entry,_,_) =>
       copy( entries = (entry :: this.entries.toList).sortBy(_.timestamp.getMillis) )
   }
