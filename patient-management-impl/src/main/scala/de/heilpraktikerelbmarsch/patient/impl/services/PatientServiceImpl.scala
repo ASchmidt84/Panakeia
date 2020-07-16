@@ -6,7 +6,10 @@ import akka.NotUsed
 import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, EntityRef}
 import akka.util.Timeout
 import com.lightbend.lagom.scaladsl.api.ServiceCall
+import com.lightbend.lagom.scaladsl.api.broker.Topic
 import com.lightbend.lagom.scaladsl.api.transport.{BadRequest, NotFound}
+import com.lightbend.lagom.scaladsl.broker.TopicProducer
+import com.lightbend.lagom.scaladsl.persistence.{EventStreamElement, PersistentEntityRegistry}
 import com.lightbend.lagom.scaladsl.server.ServerServiceCall
 import com.typesafe.config.Config
 import de.heilpraktikerelbmarsch.patient.api.adt.{PatientPicture, PatientStatus, PatientView}
@@ -25,6 +28,7 @@ import scala.language.implicitConversions
 import scala.util.Random
 
 class PatientServiceImpl(override val securityConfig: org.pac4j.core.config.Config,
+                         persistentEntityRegistry: PersistentEntityRegistry,
                          clusterSharding: ClusterSharding,
                          repo: PatientRepository)(implicit ec: ExecutionContext, val config: Config) extends PatientService with SystemSecuredService {
 
@@ -42,6 +46,7 @@ class PatientServiceImpl(override val securityConfig: org.pac4j.core.config.Conf
   }
 
   private implicit def toView(summary: Summary): PatientView = PatientView(
+    summary.number,
     summary.personalData, summary.postalAddress, summary.birthdate,
     summary.email, summary.status, summary.phonePrivate,
     summary.phoneWork, summary.cellPhone, summary.fax,
@@ -276,4 +281,62 @@ class PatientServiceImpl(override val securityConfig: org.pac4j.core.config.Conf
       _.ask[Confirmation](reply => Patient.ClearPicture(profile,reply)).map(replyToView)
     }
   }}
+
+  override def createdTopic(): Topic[PatientView] = TopicProducer.taggedStreamWithOffset(Patient.Event.Tag) { (tag, offset) =>
+    persistentEntityRegistry
+      .eventStream(tag,offset)
+      .filter(_.event.isInstanceOf[Patient.Created])
+      .mapAsync(1) {
+        case EventStreamElement(id, _, offset) =>
+          idToView(UUID.fromString(id)).map{r =>
+            r -> offset
+          }.recover{
+            case e => throw NotFound(e)
+          }
+//          entityRef(UUID.fromString(id))
+//            .ask[Confirmation](replyTo => Fulfiller.Get(replyTo) )
+//            .map{
+//              case CommandAccepted(summary) =>
+//                FulfillerTopic(UUID.fromString(id),summary.vendorNumber,event.datetime) -> offset
+//              case _ => throw BadRequest("Error")
+//            }
+        case _ => throw BadRequest("Error while processing")
+      }
+    //      persistentEntityRegistry.eventStream(tag, offset).filter {
+    //        _.event match {
+    //          case x@(_: fullFillerEvent.ContactRemoved) => true
+    //          case _ => false
+    //        }
+    //      }.mapAsync(1){ er =>
+    //        val event = er.event.asInstanceOf[fullFillerEvent.ContactRemoved]
+    //        val uuid = UUID.fromString(er.entityId)
+    //        getFullFillerState(uuid).map{state =>
+    //          FullFillerContactDeletedTopic(uuid,state.accessKey.get,event.instant,event.contact) -> offset
+    //        }
+    //      }
+  }
+
+  override def deletedTopic(): Topic[String] = TopicProducer.taggedStreamWithOffset(Patient.Event.Tag){ (tag,offset) =>
+    persistentEntityRegistry
+      .eventStream(tag,offset)
+      .filter(_.event.isInstanceOf[Patient.Deleted])
+      .mapAsync(1){
+        case EventStreamElement(_,event,off) =>
+          Future.successful(event.asInstanceOf[Patient.Deleted].number -> off)
+        case _ => throw BadRequest("Error while processing")
+      }
+  }
+
+  override def statusChangedTopic(): Topic[PatientView] = TopicProducer.taggedStreamWithOffset(Patient.Event.Tag){ (tag,offset) =>
+    persistentEntityRegistry
+      .eventStream(tag,offset)
+      .filter(_.event.isInstanceOf[Patient.StatusChanged])
+      .mapAsync(1){
+        case EventStreamElement(id,_,off) =>
+          idToView(UUID.fromString(id))
+            .map(r => r -> off)
+            .recover(s => throw NotFound(s))
+        case _ => throw BadRequest("Error while processing")
+      }
+  }
 }

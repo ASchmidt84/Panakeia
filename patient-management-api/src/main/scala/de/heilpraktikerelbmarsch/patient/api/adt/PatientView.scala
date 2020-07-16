@@ -4,7 +4,8 @@ import de.heilpraktikerelbmarsch.util.adt.contacts.{EmailAddress, PersonalData, 
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, OFormat}
 
-case class PatientView(personalData: PersonalData,
+case class PatientView(number: String,
+                       personalData: PersonalData,
                        postalAddress: Option[PostalAddress],
                        birthdate: Option[LocalDate],
                        email: Option[EmailAddress],

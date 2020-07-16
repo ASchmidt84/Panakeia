@@ -187,7 +187,8 @@ object Patient {
                               operator: Operator,
                               timestamp: DateTime = DateTime.now()) extends Event
 
-  final case class Deleted(reason: String,
+  final case class Deleted(number: String,
+                           reason: String,
                            operator: Operator,
                            timestamp: DateTime = DateTime.now()) extends Event
 
@@ -313,7 +314,7 @@ final case class Patient(number: String,
                        operator: Operator,
                        replyTo: ActorRef[Confirmation]): ReplyEffect[Event,Patient] = {
     Effect
-      .persist(Deleted(reason,operator))
+      .persist(Deleted(number,reason,operator))
       .thenReply(replyTo)(r => CommandAccepted(toSummary(r)))
   }
 

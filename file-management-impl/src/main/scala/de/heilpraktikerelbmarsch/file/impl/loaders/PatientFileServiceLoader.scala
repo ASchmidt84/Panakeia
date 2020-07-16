@@ -17,6 +17,7 @@ import play.api.libs.ws.ahc.AhcWSComponents
 import com.softwaremill.macwire.wire
 import de.heilpraktikerelbmarsch.file.impl.file.{PatientFile, PatientFileProcessor, PatientFileRepository, SerializerRegistry}
 import de.heilpraktikerelbmarsch.file.impl.services.FileServiceImpl
+import de.heilpraktikerelbmarsch.file.impl.subscriber.PatientSubscriber
 
 import scala.concurrent.ExecutionContext
 
@@ -67,6 +68,7 @@ trait PatientFileServiceComponents extends LagomServerComponents
   //Repos
   lazy val globalRepository = wire[PatientFileRepository]
 
+  val subscriber: PatientSubscriber = wire[PatientSubscriber]
 
 
 

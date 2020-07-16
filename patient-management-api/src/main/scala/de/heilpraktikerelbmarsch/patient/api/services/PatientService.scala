@@ -1,6 +1,10 @@
 package de.heilpraktikerelbmarsch.patient.api.services
 
+import java.util.UUID
+
 import akka.NotUsed
+import com.lightbend.lagom.scaladsl.api.broker.Topic
+import com.lightbend.lagom.scaladsl.api.broker.kafka.{KafkaProperties, PartitionKeyStrategy}
 import com.lightbend.lagom.scaladsl.api.deser.PathParamSerializer
 import com.lightbend.lagom.scaladsl.api.transport.{Method, NotFound}
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceAcl, ServiceCall}
@@ -134,6 +138,14 @@ trait PatientService extends Service {
     }
   }
 
+  //--- TOPICS ----------------------------------------------------------
+
+  def createdTopic(): Topic[PatientView]
+  def deletedTopic(): Topic[String]
+  def statusChangedTopic(): Topic[PatientView]
+
+  //--- TOPICS ----------------------------------------------------------
+
 
   override final def descriptor: Descriptor = {
     import Service._
@@ -156,9 +168,35 @@ trait PatientService extends Service {
         restCall(Method.DELETE,path(":number/picture"), clearPatientPicture _),
         restCall(Method.POST,path(""), createPatient _)
       )
+      .withTopics(
+        topic(PatientService.TOPIC_CREATED, createdTopic _ )
+          .addProperty(
+            KafkaProperties.partitionKeyStrategy,
+            PartitionKeyStrategy[PatientView](_.number)
+          ),
+        topic(PatientService.TOPIC_STATUS_CHANGED, statusChangedTopic _ )
+          .addProperty(
+            KafkaProperties.partitionKeyStrategy,
+            PartitionKeyStrategy[String](_)
+          ),
+        topic(PatientService.TOPIC_DELETED, statusChangedTopic _ )
+          .addProperty(
+            KafkaProperties.partitionKeyStrategy,
+            PartitionKeyStrategy[PatientView](_.number)
+          )
+      )
       .withAutoAcl(true)
   }
 
   private def path(x: String) = s"/api/${PatientServiceIdentifier.path}/$x"
+
+}
+
+
+object PatientService {
+
+  val TOPIC_CREATED = "patient_created_topic"
+  val TOPIC_DELETED = "patient_deleted_topic"
+  val TOPIC_STATUS_CHANGED = "patient_status_changed_topic"
 
 }

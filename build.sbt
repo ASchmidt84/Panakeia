@@ -184,7 +184,7 @@ lazy val `file-management-impl` = (project in file("file-management-impl"))
   )
   .settings(dockerSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`file-management-api`,`security-api`,`binary-management-api`)
+  .dependsOn(`file-management-api`,`security-api`,`binary-management-api`,`patient-management-api`)
 
 
 lazy val `benefitRate-management-api` = (project in file("benefitRate-management-api"))
