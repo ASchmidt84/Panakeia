@@ -18,6 +18,7 @@ import com.softwaremill.macwire.wire
 import de.heilpraktikerelbmarsch.file.impl.file.{PatientFile, PatientFileProcessor, PatientFileRepository, SerializerRegistry}
 import de.heilpraktikerelbmarsch.file.impl.services.FileServiceImpl
 import de.heilpraktikerelbmarsch.file.impl.subscriber.PatientSubscriber
+import de.heilpraktikerelbmarsch.patient.api.services.PatientService
 
 import scala.concurrent.ExecutionContext
 
@@ -54,6 +55,8 @@ trait PatientFileServiceComponents extends LagomServerComponents
 
   override val jwtClient: HeaderClient = headerClient
 
+  val patientService: PatientService
+
   //Lagom Server
   override lazy val lagomServer = serverFor[FileService](wire[FileServiceImpl])
 
@@ -67,8 +70,6 @@ trait PatientFileServiceComponents extends LagomServerComponents
 
   //Repos
   lazy val globalRepository = wire[PatientFileRepository]
-
-  val subscriber: PatientSubscriber = wire[PatientSubscriber]
 
 
 
@@ -85,5 +86,8 @@ trait PatientFileServiceComponents extends LagomServerComponents
 abstract class PatientFileServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with PatientFileServiceComponents {
-  //
+  override lazy val patientService: PatientService = serviceClient.implement[PatientService]
+
+  val subscriber: PatientSubscriber = new PatientSubscriber(patientService,clusterSharding,globalRepository)(executionContext)
+
 }

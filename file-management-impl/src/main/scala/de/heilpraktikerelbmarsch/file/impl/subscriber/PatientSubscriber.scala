@@ -22,18 +22,19 @@ class PatientSubscriber(service: PatientService,
 
   implicit val timeout = Timeout(30.seconds)
 
-  service.createdTopic()
+  service.createdTopic
     .subscribe
     .atLeastOnce(
       Flow.fromFunction(r => createFile(r) )
     )
 
-  service.deletedTopic()
+  service.deletedTopic
     .subscribe
     .atLeastOnce(
       Flow.fromFunction(r => closeFile(r))
     )
-  service.statusChangedTopic()
+
+  service.statusChangedTopic
     .subscribe
     .atLeastOnce(
       Flow.fromFunction(d => statusChanged(d) )

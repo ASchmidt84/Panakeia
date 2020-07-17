@@ -140,9 +140,9 @@ trait PatientService extends Service {
 
   //--- TOPICS ----------------------------------------------------------
 
-  def createdTopic(): Topic[PatientView]
-  def deletedTopic(): Topic[String]
-  def statusChangedTopic(): Topic[PatientView]
+  def createdTopic: Topic[PatientView]
+  def deletedTopic: Topic[String]
+  def statusChangedTopic: Topic[PatientView]
 
   //--- TOPICS ----------------------------------------------------------
 
@@ -169,20 +169,20 @@ trait PatientService extends Service {
         restCall(Method.POST,path(""), createPatient _)
       )
       .withTopics(
-        topic(PatientService.TOPIC_CREATED, createdTopic _ )
+        topic(PatientService.TOPIC_CREATED, createdTopic )
           .addProperty(
             KafkaProperties.partitionKeyStrategy,
             PartitionKeyStrategy[PatientView](_.number)
           ),
-        topic(PatientService.TOPIC_STATUS_CHANGED, statusChangedTopic _ )
-          .addProperty(
-            KafkaProperties.partitionKeyStrategy,
-            PartitionKeyStrategy[String](_)
-          ),
-        topic(PatientService.TOPIC_DELETED, statusChangedTopic _ )
+        topic(PatientService.TOPIC_STATUS_CHANGED, statusChangedTopic )
           .addProperty(
             KafkaProperties.partitionKeyStrategy,
             PartitionKeyStrategy[PatientView](_.number)
+          ),
+        topic(PatientService.TOPIC_DELETED, deletedTopic )
+          .addProperty(
+            KafkaProperties.partitionKeyStrategy,
+            PartitionKeyStrategy[String](a => a)
           )
       )
       .withAutoAcl(true)
@@ -195,8 +195,8 @@ trait PatientService extends Service {
 
 object PatientService {
 
-  val TOPIC_CREATED = "patient_created_topic"
-  val TOPIC_DELETED = "patient_deleted_topic"
-  val TOPIC_STATUS_CHANGED = "patient_status_changed_topic"
+  val TOPIC_CREATED = "patient-created-topic"
+  val TOPIC_DELETED = "patient-deleted-topic"
+  val TOPIC_STATUS_CHANGED = "patient-status-changed-topic"
 
 }

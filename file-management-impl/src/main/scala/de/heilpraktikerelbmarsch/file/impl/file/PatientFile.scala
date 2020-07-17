@@ -18,6 +18,8 @@ object PatientFile {
   import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._
   import PatientView._
   import FileStatus._
+  import Operator._
+  import Entry._
 
 
   // Commands ------------------------------------------------------------------------------------------------------>
@@ -102,7 +104,7 @@ object PatientFile {
 
   implicit val createdJsonFormat: OFormat[Created] = Json.format
   implicit val closedJsonFormat: OFormat[Closed] = Json.format
-  implicit val reopenedJsonFormat: OFormat[Reopen] = Json.format
+  implicit val reopenedJsonFormat: OFormat[Reopened] = Json.format
   implicit val entryAddedJsonFormat: OFormat[EntryAdded] = Json.format
 
   // Events <--------------------------------------------------------------------------------------------------------

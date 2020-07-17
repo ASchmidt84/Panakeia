@@ -50,10 +50,9 @@ trait PatientServiceComponents extends LagomServerComponents
   implicit def materializer: Materializer
   implicit def c: Config = this.configuration.underlying
 
-  override val jwtClient: HeaderClient = headerClient
+  override lazy val jwtClient: HeaderClient = headerClient
 
-  //Lagom Server
-  override lazy val lagomServer = serverFor[PatientService](wire[PatientServiceImpl])
+
 
   //Json Registry
   lazy val jsonSerializerRegistry = SerializerRegistry
@@ -65,8 +64,6 @@ trait PatientServiceComponents extends LagomServerComponents
 
   //Repos
   lazy val globalRepository = wire[PatientRepository]
-
-
 
 
   // Initialize the sharding for the ShoppingCart aggregate.
@@ -82,5 +79,6 @@ trait PatientServiceComponents extends LagomServerComponents
 abstract class PatientServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with PatientServiceComponents {
-  //
+  //Lagom Server
+  override lazy val lagomServer = serverFor[PatientService](wire[PatientServiceImpl])
 }

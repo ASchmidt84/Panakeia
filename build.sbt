@@ -50,6 +50,13 @@ val cleanItAll = true
 lagomCassandraCleanOnStart in ThisBuild := cleanItAll
 lagomKafkaCleanOnStart in ThisBuild := cleanItAll
 lagomCassandraEnabled in ThisBuild := false
+lagomKafkaEnabled in ThisBuild := false
+//lagomKafkaAddress in ThisBuild := "localhost"
+lagomKafkaPort in ThisBuild := 10000
+//https://itnext.io/how-to-install-kafka-using-docker-a2b7c746cbdc
+//docker network create kafka-net --driver bridge
+//docker run --name zookeeper-server -d -p 2181:2181 --network kafka-net -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:latest
+//docker run --name kafka-server1 --hostname localhost -d --network kafka-net -e auto.create.topics.enable=true -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:10000 -p 10000:9092 bitnami/kafka:latest
 
 
 lazy val `panakeia` = (project in file("."))
@@ -57,7 +64,8 @@ lazy val `panakeia` = (project in file("."))
     `security-api`, `security-impl`,
     `binary-management-api`,`binary-management-impl`,
     `benefitRate-management-api`, `benefitRate-management-impl`,
-    `patient-management-api`,`patient-management-impl`
+    `patient-management-api`,`patient-management-impl`,
+    `file-management-api`,`file-management-impl`
   )
 
 

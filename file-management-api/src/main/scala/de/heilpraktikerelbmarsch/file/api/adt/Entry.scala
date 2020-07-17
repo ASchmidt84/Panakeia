@@ -4,6 +4,9 @@ import de.heilpraktikerelbmarsch.util.adt.contacts.Operator
 import julienrf.json.derived
 import org.joda.time.DateTime
 import play.api.libs.json.OFormat
+import de.heilpraktikerelbmarsch.util.converters.JsonFormatters._
+import Operator._
+import EntryTyp._
 
 sealed trait Entry{
   def timestamp: DateTime
